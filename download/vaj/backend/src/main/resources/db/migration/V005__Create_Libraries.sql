@@ -1,0 +1,22 @@
+-- V005__Create_Libraries.sql
+CREATE TABLE Libraries (
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    Name NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(1000) NULL,
+    Status NVARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    CreatedBy UNIQUEIDENTIFIER NULL,
+    UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    UpdatedBy UNIQUEIDENTIFIER NULL,
+    DeletedAt DATETIME2 NULL,
+    DeletedBy UNIQUEIDENTIFIER NULL,
+    IsDeleted BIT NOT NULL DEFAULT 0,
+    Version INT NOT NULL DEFAULT 0,
+    CONSTRAINT PK_Libraries PRIMARY KEY (Id),
+    CONSTRAINT FK_Libraries_Users FOREIGN KEY (UserId) REFERENCES Users(Id)
+);
+
+CREATE UNIQUE INDEX IX_Libraries_UserId_Name ON Libraries (UserId, Name) WHERE IsDeleted = 0;
+CREATE INDEX IX_Libraries_UserId ON Libraries (UserId);
+CREATE INDEX IX_Libraries_Status ON Libraries (Status);

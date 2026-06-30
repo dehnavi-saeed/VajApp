@@ -1,0 +1,66 @@
+-- V006__Create_Authors.sql
+CREATE TABLE Authors (
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+    Name NVARCHAR(200) NOT NULL,
+    Bio NVARCHAR(max) NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT PK_Authors PRIMARY KEY (Id)
+);
+CREATE INDEX IX_Authors_Name ON Authors (Name);
+
+-- V007__Create_Publishers.sql
+CREATE TABLE Publishers (
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+    Name NVARCHAR(200) NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT PK_Publishers PRIMARY KEY (Id)
+);
+CREATE INDEX IX_Publishers_Name ON Publishers (Name);
+
+-- V008__Create_Books.sql
+CREATE TABLE Books (
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+    LibraryId UNIQUEIDENTIFIER NOT NULL,
+    Title NVARCHAR(500) NOT NULL,
+    Subtitle NVARCHAR(500) NULL,
+    ISBN NVARCHAR(20) NULL,
+    Description NVARCHAR(max) NULL,
+    Language NVARCHAR(10) NOT NULL DEFAULT 'en',
+    PageCount INT NULL,
+    Format NVARCHAR(20) NOT NULL DEFAULT 'PHYSICAL',
+    CoverUrl NVARCHAR(500) NULL,
+    Status NVARCHAR(20) NOT NULL DEFAULT 'UNREAD',
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    CreatedBy UNIQUEIDENTIFIER NULL,
+    UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    UpdatedBy UNIQUEIDENTIFIER NULL,
+    DeletedAt DATETIME2 NULL,
+    DeletedBy UNIQUEIDENTIFIER NULL,
+    IsDeleted BIT NOT NULL DEFAULT 0,
+    Version INT NOT NULL DEFAULT 0,
+    CONSTRAINT PK_Books PRIMARY KEY (Id),
+    CONSTRAINT FK_Books_Libraries FOREIGN KEY (LibraryId) REFERENCES Libraries(Id)
+);
+CREATE INDEX IX_Books_LibraryId ON Books (LibraryId);
+CREATE INDEX IX_Books_ISBN ON Books (ISBN) WHERE ISBN IS NOT NULL AND IsDeleted = 0;
+CREATE INDEX IX_Books_Status ON Books (Status);
+
+-- V009__Create_Book_Authors.sql
+CREATE TABLE BookAuthors (
+    BookId UNIQUEIDENTIFIER NOT NULL,
+    AuthorId UNIQUEIDENTIFIER NOT NULL,
+    CONSTRAINT PK_BookAuthors PRIMARY KEY (BookId, AuthorId),
+    CONSTRAINT FK_BookAuthors_Books FOREIGN KEY (BookId) REFERENCES Books(Id),
+    CONSTRAINT FK_BookAuthors_Authors FOREIGN KEY (AuthorId) REFERENCES Authors(Id)
+);
+
+-- V010__Create_Book_Publishers.sql
+CREATE TABLE BookPublishers (
+    BookId UNIQUEIDENTIFIER NOT NULL,
+    PublisherId UNIQUEIDENTIFIER NOT NULL,
+    CONSTRAINT PK_BookPublishers PRIMARY KEY (BookId, PublisherId),
+    CONSTRAINT FK_BookPublishers_Books FOREIGN KEY (BookId) REFERENCES Books(Id),
+    CONSTRAINT FK_BookPublishers_Publishers FOREIGN KEY (PublisherId) REFERENCES Publishers(Id)
+);
