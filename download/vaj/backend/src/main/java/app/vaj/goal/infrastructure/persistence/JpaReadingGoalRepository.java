@@ -5,4 +5,5 @@ import java.util.UUID;
 public interface JpaReadingGoalRepository extends JpaRepository<ReadingGoalEntity, UUID> {
     Optional<ReadingGoalEntity> findByIdAndIsDeletedFalse(UUID id);
     List<ReadingGoalEntity> findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(UUID userId);
+    long countByUserIdAndStatusAndIsDeletedFalse(UUID userId, ReadingGoalEntity.StatusJpa status);
 }

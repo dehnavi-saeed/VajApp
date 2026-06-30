@@ -21,6 +21,7 @@ public class BookEntity {
     @Column(name = "PageCount") private Integer pageCount;
     @Column(name = "Format", nullable = false, length = 20) @Enumerated(EnumType.STRING) private FormatJpa format;
     @Column(name = "CoverUrl", length = 500) private String coverUrl;
+    @Column(name = "PublisherId") private UUID publisherId;
     @Column(name = "Status", nullable = false, length = 20) @Enumerated(EnumType.STRING) private StatusJpa status;
     @Column(name = "CreatedAt", nullable = false) private Instant createdAt;
     @Column(name = "CreatedBy") private UUID createdBy;

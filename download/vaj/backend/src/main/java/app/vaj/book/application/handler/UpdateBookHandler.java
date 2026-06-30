@@ -37,4 +37,22 @@ public class UpdateBookHandler {
 
         return bookMapper.toResponse(book);
     }
+
+    @Transactional
+    public BookResponse handleStartReading(UUID id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Book", id));
+        book.startReading(clock);
+        bookRepository.save(book);
+        return bookMapper.toResponse(book);
+    }
+
+    @Transactional
+    public BookResponse handleCompleteReading(UUID id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Book", id));
+        book.completeReading(clock);
+        bookRepository.save(book);
+        return bookMapper.toResponse(book);
+    }
 }

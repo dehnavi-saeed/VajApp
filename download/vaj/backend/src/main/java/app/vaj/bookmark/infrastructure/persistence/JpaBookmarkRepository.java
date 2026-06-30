@@ -7,4 +7,5 @@ import java.util.UUID;
 public interface JpaBookmarkRepository extends JpaRepository<BookmarkEntity, UUID> {
     Optional<BookmarkEntity> findByIdAndIsDeletedFalse(UUID id);
     List<BookmarkEntity> findByBookIdAndIsDeletedFalseOrderBySortOrderAsc(UUID bookId);
+    long countByUserIdAndIsDeletedFalse(UUID userId);
 }

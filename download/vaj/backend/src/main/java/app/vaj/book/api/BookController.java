@@ -23,6 +23,7 @@ import java.util.UUID;
 public class BookController {
 
     private final CreateBookHandler createBookHandler;
+    private final UpdateBookHandler updateBookHandler;
     private final GetBookHandler getBookHandler;
     private final ListBooksHandler listBooksHandler;
     private final ArchiveBookHandler archiveBookHandler;
@@ -30,12 +31,14 @@ public class BookController {
     private final DeleteBookHandler deleteBookHandler;
 
     public BookController(CreateBookHandler createBookHandler,
+                          UpdateBookHandler updateBookHandler,
                           GetBookHandler getBookHandler,
                           ListBooksHandler listBooksHandler,
                           ArchiveBookHandler archiveBookHandler,
                           RestoreBookHandler restoreBookHandler,
                           DeleteBookHandler deleteBookHandler) {
         this.createBookHandler = createBookHandler;
+        this.updateBookHandler = updateBookHandler;
         this.getBookHandler = getBookHandler;
         this.listBooksHandler = listBooksHandler;
         this.archiveBookHandler = archiveBookHandler;
@@ -70,6 +73,16 @@ public class BookController {
             @Valid @RequestBody CreateBookCommand command) {
         BookResponse response = createBookHandler.handle(currentUser.id(), command);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update a book")
+    public ResponseEntity<ApiResponse<BookResponse>> update(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateBookCommand command) {
+        BookResponse response = updateBookHandler.handle(currentUser.id(), command);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping("/{id}/archive")

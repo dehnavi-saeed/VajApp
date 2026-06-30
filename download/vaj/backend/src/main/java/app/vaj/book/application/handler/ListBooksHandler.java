@@ -4,6 +4,7 @@ import app.vaj.book.application.dto.BookResponse;
 import app.vaj.book.application.query.ListBooksQuery;
 import app.vaj.book.domain.Book;
 import app.vaj.book.domain.repository.BookRepository;
+import app.vaj.book.infrastructure.mapper.BookMapper;
 import app.vaj.common.application.dto.PaginatedResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,9 +17,11 @@ import java.util.List;
 public class ListBooksHandler {
 
     private final BookRepository bookRepository;
+    private final BookMapper bookMapper;
 
-    public ListBooksHandler(BookRepository bookRepository) {
+    public ListBooksHandler(BookRepository bookRepository, BookMapper bookMapper) {
         this.bookRepository = bookRepository;
+        this.bookMapper = bookMapper;
     }
 
     @Transactional(readOnly = true)
@@ -29,10 +32,7 @@ public class ListBooksHandler {
                 : bookRepository.findByLibraryId(query.libraryId(), pageable);
 
         List<BookResponse> items = result.getContent().stream()
-                .map(b -> new BookResponse(b.getId(), b.getLibraryId(), b.getTitle(), b.getSubtitle(),
-                        b.getIsbn(), b.getDescription(), b.getLanguage(), b.getPageCount(),
-                        b.getFormat().name(), b.getCoverUrl(), b.getStatus().name(),
-                        java.util.List.of(), null, b.getCreatedAt(), b.getUpdatedAt()))
+                .map(bookMapper::toResponse)
                 .toList();
 
         return PaginatedResponse.of(items, query.page(), query.size(), result.getTotalElements());

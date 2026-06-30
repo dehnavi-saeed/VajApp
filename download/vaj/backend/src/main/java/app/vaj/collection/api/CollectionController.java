@@ -1,4 +1,5 @@
 package app.vaj.collection.api;
+
 import app.vaj.collection.application.command.*;
 import app.vaj.collection.application.dto.CollectionResponse;
 import app.vaj.collection.application.handler.*;
@@ -11,19 +12,27 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/collections")
 @Tag(name = "Collections", description = "Collection management")
 public class CollectionController {
     private final CreateCollectionHandler createHandler;
+    private final UpdateCollectionHandler updateHandler;
     private final DeleteCollectionHandler deleteHandler;
     private final ListCollectionsHandler listHandler;
 
-    public CollectionController(CreateCollectionHandler createHandler, DeleteCollectionHandler deleteHandler,
-                               ListCollectionsHandler listHandler) {
-        this.createHandler = createHandler; this.deleteHandler = deleteHandler; this.listHandler = listHandler;
+    public CollectionController(CreateCollectionHandler createHandler,
+                                 UpdateCollectionHandler updateHandler,
+                                 DeleteCollectionHandler deleteHandler,
+                                 ListCollectionsHandler listHandler) {
+        this.createHandler = createHandler;
+        this.updateHandler = updateHandler;
+        this.deleteHandler = deleteHandler;
+        this.listHandler = listHandler;
     }
 
     @GetMapping
@@ -36,12 +45,21 @@ public class CollectionController {
     @Operation(summary = "Create a collection")
     public ResponseEntity<ApiResponse<CollectionResponse>> create(
             @AuthenticationPrincipal CurrentUser user, @Valid @RequestBody CreateCollectionCommand cmd) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(createHandler.handle(user.id(), cmd)));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(createHandler.handle(user.id(), cmd)));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update a collection")
+    public ResponseEntity<ApiResponse<CollectionResponse>> update(
+            @PathVariable UUID id, @Valid @RequestBody UpdateCollectionCommand cmd) {
+        return ResponseEntity.ok(ApiResponse.success(updateHandler.handle(id, cmd)));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a collection")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable java.util.UUID id) {
-        deleteHandler.handle(id); return ResponseEntity.ok(ApiResponse.success(null));
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
+        deleteHandler.handle(id);
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

@@ -10,6 +10,7 @@ public class TagRepositoryImpl implements TagRepository {
     public TagRepositoryImpl(JpaTagRepository jpa) { this.jpa = jpa; }
     @Override public Tag save(Tag t) { jpa.save(toEntity(t)); return t; }
     @Override public List<Tag> findByUserId(UUID userId) { return jpa.findByUserIdAndIsDeletedFalseOrderByNameAsc(userId).stream().map(this::toDomain).toList(); }
+    @Override public Optional<Tag> findById(UUID id) { return jpa.findByIdAndIsDeletedFalse(id).map(this::toDomain); }
     @Override public boolean existsByUserIdAndName(UUID userId, String name) { return jpa.existsByUserIdAndNameAndIsDeletedFalse(userId, name); }
     private Tag toDomain(TagEntity e) {
         try {

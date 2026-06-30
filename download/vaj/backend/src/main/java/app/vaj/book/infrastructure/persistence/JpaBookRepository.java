@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,4 +17,12 @@ public interface JpaBookRepository extends JpaRepository<BookEntity, UUID> {
     Page<BookEntity> findByLibraryIdAndStatusAndIsDeletedFalse(UUID libraryId, String status, Pageable pageable);
 
     long countByLibraryIdAndIsDeletedFalse(UUID libraryId);
+
+    long countByLibraryIdInAndIsDeletedFalse(List<UUID> libraryIds);
+
+    long countByLibraryIdInAndStatusAndIsDeletedFalse(List<UUID> libraryIds, String status);
+
+    List<BookEntity> findByLibraryIdInAndStatusInAndIsDeletedFalseOrderByUpdatedAtDesc(List<UUID> libraryIds, List<String> statuses, Pageable pageable);
+
+    List<BookEntity> findByLibraryIdInAndTitleContainingIgnoreCaseAndIsDeletedFalse(List<UUID> libraryIds, String title, Pageable pageable);
 }
