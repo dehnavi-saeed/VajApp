@@ -62,7 +62,6 @@ public class PublisherRepositoryImpl implements PublisherRepository {
             setField(p, "status", PublisherStatus.valueOf(e.getStatus().name()));
             setField(p, "createdAt", e.getCreatedAt());
             setField(p, "updatedAt", e.getUpdatedAt());
-            setField(p, "isDeleted", e.isDeleted());
             return p;
         } catch (Exception ex) {
             throw new RuntimeException("Failed to map PublisherEntity to domain", ex);

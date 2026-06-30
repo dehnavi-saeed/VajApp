@@ -2,6 +2,7 @@ package app.vaj.book.infrastructure.persistence;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 import java.util.UUID;

@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,28 +40,26 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     private Book toDomain(BookEntity e) {
-        Book book = Book.class.cast(new Object());
         try {
-            java.lang.reflect.Field id = Book.class.getDeclaredField("id");
-            id.setAccessible(true);
-            java.lang.reflect.Field decl = BaseAggregateRoot.class.getDeclaredField("id");
-            decl.setAccessible(true);
-            decl.set(book, e.getId());
-        } catch (Exception ex) { /* fallback */ }
-        Book b = new Book(e.getId()) {};
-        setField(b, "libraryId", e.getLibraryId());
-        setField(b, "title", e.getTitle());
-        setField(b, "subtitle", e.getSubtitle());
-        setField(b, "isbn", e.getIsbn());
-        setField(b, "description", e.getDescription());
-        setField(b, "language", e.getLanguage());
-        setField(b, "pageCount", e.getPageCount());
-        setField(b, "format", e.getFormat() != null ? BookFormat.valueOf(e.getFormat().name()) : BookFormat.PHYSICAL);
-        setField(b, "coverUrl", e.getCoverUrl());
-        setField(b, "status", e.getStatus() != null ? ReadingStatus.valueOf(e.getStatus().name()) : ReadingStatus.UNREAD);
-        setField(b, "createdAt", e.getCreatedAt());
-        setField(b, "updatedAt", e.getUpdatedAt());
-        return b;
+            var ctor = Book.class.getDeclaredConstructor(UUID.class);
+            ctor.setAccessible(true);
+            Book b = ctor.newInstance(e.getId());
+            setField(b, "libraryId", e.getLibraryId());
+            setField(b, "title", e.getTitle());
+            setField(b, "subtitle", e.getSubtitle());
+            setField(b, "isbn", e.getIsbn());
+            setField(b, "description", e.getDescription());
+            setField(b, "language", e.getLanguage());
+            setField(b, "pageCount", e.getPageCount());
+            setField(b, "format", e.getFormat() != null ? BookFormat.valueOf(e.getFormat().name()) : BookFormat.PHYSICAL);
+            setField(b, "coverUrl", e.getCoverUrl());
+            setField(b, "status", e.getStatus() != null ? ReadingStatus.valueOf(e.getStatus().name()) : ReadingStatus.UNREAD);
+            setField(b, "createdAt", e.getCreatedAt());
+            setField(b, "updatedAt", e.getUpdatedAt());
+            return b;
+        } catch (Exception ex) {
+            throw new RuntimeException("Mapping failed", ex);
+        }
     }
 
     private BookEntity toEntity(Book book) {
@@ -75,18 +75,24 @@ public class BookRepositoryImpl implements BookRepository {
         e.setFormat(BookEntity.FormatJpa.valueOf(book.getFormat().name()));
         e.setStatus(BookEntity.StatusJpa.valueOf(book.getStatus().name()));
         e.setCoverUrl(book.getCoverUrl());
-        e.setCreatedAt(book.getCreatedAt() != null ? book.getCreatedAt() : java.time.Instant.now());
-        e.setUpdatedAt(book.getUpdatedAt() != null ? book.getUpdatedAt() : java.time.Instant.now());
-        e.setVersion(book.getVersion() != null ? book.getVersion() : 0);
+        e.setCreatedAt(book.getCreatedAt() != null ? book.getCreatedAt() : Instant.now());
+        e.setUpdatedAt(book.getUpdatedAt() != null ? book.getUpdatedAt() : Instant.now());
+        e.setVersion(book.getVersion() != null ? book.getVersion() : 0L);
         e.setDeleted(book.isDeleted());
         return e;
     }
 
     private void setField(Object target, String name, Object value) {
         try {
-            java.lang.reflect.Field f = target.getClass().getDeclaredField(name);
+            Field f = target.getClass().getDeclaredField(name);
             f.setAccessible(true);
             f.set(target, value);
-        } catch (Exception ignored) {}
+        } catch (NoSuchFieldException ex) {
+            try {
+                Field f = target.getClass().getSuperclass().getDeclaredField(name);
+                f.setAccessible(true);
+                f.set(target, value);
+            } catch (Exception ignored) {}
+        } catch (IllegalAccessException ignored) {}
     }
 }

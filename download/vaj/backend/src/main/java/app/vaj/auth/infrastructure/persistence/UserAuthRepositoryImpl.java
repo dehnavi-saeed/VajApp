@@ -5,7 +5,7 @@ import app.vaj.auth.domain.UserAuthStatus;
 import app.vaj.auth.domain.repository.UserAuthRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
+import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,33 +51,22 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
     }
 
     private UserAuth toDomain(UserAuthEntity entity) {
-        UserAuth user = new UserAuth(entity.getId());
-        user = reconstructUser(user, entity);
-        return user;
-    }
-
-    private UserAuth reconstructUser(UserAuth user, UserAuthEntity entity) {
-        UserAuth result = UserAuth.class.cast(user);
-        java.lang.reflect.Field[] fields = UserAuth.class.getDeclaredFields();
         try {
-            setField(result, "username", entity.getUsername());
-            setField(result, "email", entity.getEmail());
-            setField(result, "passwordHash", entity.getPasswordHash());
-            setField(result, "status", entity.getStatus() != null ? UserAuthStatus.valueOf(entity.getStatus().name()) : UserAuthStatus.PENDING);
-            setField(result, "createdAt", entity.getCreatedAt());
-            setField(result, "updatedAt", entity.getUpdatedAt());
-            setField(result, "deletedAt", entity.getDeletedAt());
-            setField(result, "version", entity.getVersion());
+            var ctor = UserAuth.class.getDeclaredConstructor(UUID.class);
+            ctor.setAccessible(true);
+            UserAuth user = ctor.newInstance(entity.getId());
+            setField(user, "username", entity.getUsername());
+            setField(user, "email", entity.getEmail());
+            setField(user, "passwordHash", entity.getPasswordHash());
+            setField(user, "status", entity.getStatus() != null ? UserAuthStatus.valueOf(entity.getStatus().name()) : UserAuthStatus.PENDING);
+            setField(user, "createdAt", entity.getCreatedAt());
+            setField(user, "updatedAt", entity.getUpdatedAt());
+            setField(user, "deletedAt", entity.getDeletedAt());
+            setField(user, "version", entity.getVersion());
+            return user;
         } catch (Exception e) {
             throw new RuntimeException("Failed to reconstruct UserAuth", e);
         }
-        return result;
-    }
-
-    private void setField(Object target, String fieldName, Object value) throws Exception {
-        java.lang.reflect.Field field = target.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(target, value);
     }
 
     private UserAuthEntity toEntity(UserAuth user) {
@@ -90,8 +79,22 @@ public class UserAuthRepositoryImpl implements UserAuthRepository {
         entity.setCreatedAt(user.getCreatedAt());
         entity.setUpdatedAt(user.getUpdatedAt());
         entity.setDeletedAt(user.getDeletedAt());
-        entity.setVersion(user.getVersion() != null ? user.getVersion() : 0);
+        entity.setVersion(user.getVersion() != null ? user.getVersion() : 0L);
         entity.setDeleted(user.isDeleted());
         return entity;
+    }
+
+    private void setField(Object target, String name, Object value) {
+        try {
+            Field f = target.getClass().getDeclaredField(name);
+            f.setAccessible(true);
+            f.set(target, value);
+        } catch (NoSuchFieldException ex) {
+            try {
+                Field f = target.getClass().getSuperclass().getDeclaredField(name);
+                f.setAccessible(true);
+                f.set(target, value);
+            } catch (Exception ignored) {}
+        } catch (IllegalAccessException ignored) {}
     }
 }
