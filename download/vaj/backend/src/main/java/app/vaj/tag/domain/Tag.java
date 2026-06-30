@@ -1,33 +1,40 @@
 package app.vaj.tag.domain;
 
-import java.time.Instant;
-import java.util.UUID;
+import app.vaj.common.domain.BaseAggregateRoot;
+import app.vaj.common.domain.DomainValidationException;
+import java.time.*;
+import java.util.*;
 
-public class Tag {
-
-    private final UUID id;
-    private final UUID userId;
+public class Tag extends BaseAggregateRoot {
+    private UUID userId;
     private String name;
-    private Instant createdAt;
+    private String color;
+    private String description;
+    private TagStatus status;
 
-    private Tag(UUID id, UUID userId, String name) {
-        this.id = id;
-        this.userId = userId;
-        this.name = name;
-        this.createdAt = Instant.now();
+    private Tag(UUID id) { super(id); }
+
+    public static Tag create(UUID id, UUID userId, String name, String color, String description, Clock clock) {
+        if (name == null || name.isBlank() || name.length() < 2 || name.length() > 100)
+            throw new DomainValidationException("INVALID_TAG_NAME", List.of("Tag name must be 2-100 chars."));
+        Tag t = new Tag(id);
+        t.userId = userId; t.name = name; t.color = color; t.description = description; t.status = TagStatus.ACTIVE;
+        t.markCreated(Instant.now(clock), userId);
+        return t;
     }
 
-    public static Tag create(UUID id, UUID userId, String name) {
-        if (name == null || name.isBlank() || name.length() > 100) {
-            throw new app.vaj.common.domain.DomainValidationException(
-                "INVALID_TAG_NAME", java.util.List.of("Tag name is required (max 100 chars)."));
-        }
-        return new Tag(id, userId, name);
+    public void update(String name, String color, String description, Clock clock) {
+        if (name != null) { if (name.length() < 2 || name.length() > 100) throw new DomainValidationException("INVALID_TAG_NAME", List.of("2-100.")); this.name = name; }
+        if (color != null) this.color = color;
+        if (description != null) { if (description.length() > 500) throw new DomainValidationException("LONG_DESC", List.of("Max 500.")); this.description = description; }
+        markUpdated(Instant.now(clock), userId);
     }
 
-    public void rename(String name) { this.name = name; }
-    public UUID getId() { return id; }
+    public void delete(Clock clock) { this.status = TagStatus.DELETED; markDeleted(Instant.now(clock), userId); }
+
     public UUID getUserId() { return userId; }
     public String getName() { return name; }
-    public Instant getCreatedAt() { return createdAt; }
+    public String getColor() { return color; }
+    public String getDescription() { return description; }
+    public TagStatus getStatus() { return status; }
 }

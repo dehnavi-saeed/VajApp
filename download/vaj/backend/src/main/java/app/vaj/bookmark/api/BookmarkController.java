@@ -1,40 +1,61 @@
 package app.vaj.bookmark.api;
 
+import app.vaj.bookmark.application.command.CreateBookmarkCommand;
+import app.vaj.bookmark.application.command.UpdateBookmarkCommand;
+import app.vaj.bookmark.application.dto.BookmarkResponse;
+import app.vaj.bookmark.application.handler.*;
 import app.vaj.common.application.dto.ApiResponse;
 import app.vaj.common.infrastructure.security.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/bookmarks")
 @Tag(name = "Bookmarks", description = "Bookmark management")
 public class BookmarkController {
 
-    @GetMapping("/book/{bookId}")
-    @Operation(summary = "Get bookmarks for a book")
-    public ResponseEntity<ApiResponse<Object>> listByBook(
-            @AuthenticationPrincipal CurrentUser currentUser,
-            @PathVariable UUID bookId) {
-        return ResponseEntity.ok(ApiResponse.success(Map.of("bookmarks", java.util.List.of())));
+    private final CreateBookmarkHandler createHandler;
+    private final UpdateBookmarkHandler updateHandler;
+    private final DeleteBookmarkHandler deleteHandler;
+    private final ListBookmarksHandler listHandler;
+
+    public BookmarkController(CreateBookmarkHandler createHandler, UpdateBookmarkHandler updateHandler,
+                              DeleteBookmarkHandler deleteHandler, ListBookmarksHandler listHandler) {
+        this.createHandler = createHandler; this.updateHandler = updateHandler;
+        this.deleteHandler = deleteHandler; this.listHandler = listHandler;
     }
 
-    @PostMapping
+    @GetMapping("/api/v1/books/{bookId}/bookmarks")
+    @Operation(summary = "List bookmarks for a book")
+    public ResponseEntity<ApiResponse<List<BookmarkResponse>>> list(@PathVariable UUID bookId) {
+        return ResponseEntity.ok(ApiResponse.success(listHandler.handle(bookId)));
+    }
+
+    @PostMapping("/api/v1/books/{bookId}/bookmarks")
     @Operation(summary = "Create a bookmark")
-    public ResponseEntity<ApiResponse<Map<String, UUID>>> create(
-            @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestBody Map<String, Object> body) {
-        return ResponseEntity.ok(ApiResponse.success(Map.of("id", UUID.randomUUID())));
+    public ResponseEntity<ApiResponse<BookmarkResponse>> create(
+            @AuthenticationPrincipal CurrentUser user, @PathVariable UUID bookId,
+            @Valid @RequestBody CreateBookmarkCommand cmd) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(createHandler.handle(user.id(),
+                new CreateBookmarkCommand(bookId, cmd.page(), cmd.title(), cmd.description(), cmd.color()))));
     }
 
-    @DeleteMapping("/{id}")
+    @PatchMapping("/api/v1/bookmarks/{id}")
+    @Operation(summary = "Update a bookmark")
+    public ResponseEntity<ApiResponse<BookmarkResponse>> update(@PathVariable UUID id, @Valid @RequestBody UpdateBookmarkCommand cmd) {
+        return ResponseEntity.ok(ApiResponse.success(updateHandler.handle(id, cmd)));
+    }
+
+    @DeleteMapping("/api/v1/bookmarks/{id}")
     @Operation(summary = "Delete a bookmark")
-    public ResponseEntity<ApiResponse<Void>> delete(
-            @AuthenticationPrincipal CurrentUser currentUser,
-            @PathVariable UUID id) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
+        deleteHandler.handle(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

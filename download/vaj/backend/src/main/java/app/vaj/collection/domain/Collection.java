@@ -2,54 +2,37 @@ package app.vaj.collection.domain;
 
 import app.vaj.common.domain.BaseAggregateRoot;
 import app.vaj.common.domain.DomainValidationException;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
 public class Collection extends BaseAggregateRoot {
-
     private UUID userId;
     private String name;
     private String description;
-    private List<UUID> bookIds = new ArrayList<>();
+    private CollectionStatus status;
 
     private Collection(UUID id) { super(id); }
 
     public static Collection create(UUID id, UUID userId, String name, String description, Clock clock) {
-        if (name == null || name.isBlank() || name.length() > 100) {
-            throw new DomainValidationException("INVALID_COLLECTION_NAME",
-                    List.of("Collection name is required (max 100 chars)."));
-        }
+        if (name == null || name.isBlank() || name.length() < 3 || name.length() > 200)
+            throw new DomainValidationException("INVALID_NAME", List.of("Name must be 3-200 chars."));
         Collection c = new Collection(id);
-        c.userId = userId;
-        c.name = name;
-        c.description = description;
+        c.userId = userId; c.name = name; c.description = description; c.status = CollectionStatus.ACTIVE;
         c.markCreated(Instant.now(clock), userId);
         return c;
     }
 
-    public void addBook(UUID bookId, Clock clock) {
-        if (!bookIds.contains(bookId)) {
-            bookIds.add(bookId);
-            markUpdated(Instant.now(clock), userId);
-        }
-    }
-
-    public void removeBook(UUID bookId, Clock clock) {
-        bookIds.remove(bookId);
+    public void update(String name, String description, Clock clock) {
+        if (name != null) { if (name.length() < 3 || name.length() > 200) throw new DomainValidationException("INVALID_NAME", List.of("Name 3-200.")); this.name = name; }
+        if (description != null) { if (description.length() > 1000) throw new DomainValidationException("INVALID_DESC", List.of("Max 1000.")); this.description = description; }
         markUpdated(Instant.now(clock), userId);
     }
 
-    public void rename(String name, Clock clock) {
-        if (name != null && !name.isBlank()) this.name = name;
-        markUpdated(Instant.now(clock), userId);
-    }
+    public void archive(Clock clock) { this.status = CollectionStatus.ARCHIVED; markUpdated(Instant.now(clock), userId); }
+    public void delete(Clock clock) { this.status = CollectionStatus.DELETED; markDeleted(Instant.now(clock), userId); }
 
     public UUID getUserId() { return userId; }
     public String getName() { return name; }
     public String getDescription() { return description; }
-    public List<UUID> getBookIds() { return List.copyOf(bookIds); }
+    public CollectionStatus getStatus() { return status; }
 }

@@ -4,7 +4,6 @@ import app.vaj.common.domain.BaseAggregateRoot;
 import app.vaj.common.domain.DomainValidationException;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,46 +12,83 @@ import java.util.UUID;
 public class ReadingSession extends BaseAggregateRoot {
 
     private UUID bookId;
+    private UUID userId;
     private Integer startPage;
     private Integer endPage;
-    private Long durationMs;
-    private Instant startedAt;
-    private Instant endedAt;
+    private Integer durationMinutes;
+    private ReadingState state;
 
     private ReadingSession(UUID id) { super(id); }
 
-    public static ReadingSession start(UUID id, UUID bookId, Integer startPage, Clock clock) {
-        List<String> errors = new ArrayList<>();
-        if (startPage != null && startPage <= 0) errors.add("Start page must be positive.");
-        if (!errors.isEmpty()) throw new DomainValidationException("INVALID_SESSION", errors);
-
+    public static ReadingSession create(UUID id, UUID bookId, UUID userId, int startPage, Clock clock) {
         ReadingSession session = new ReadingSession(id);
         session.bookId = bookId;
+        session.userId = userId;
         session.startPage = startPage;
-        session.startedAt = Instant.now(clock);
-        session.markCreated(session.startedAt, null);
+        session.durationMinutes = 0;
+        session.state = ReadingState.STARTED;
+        session.markCreated(Instant.now(clock), userId);
         return session;
     }
 
-    public void end(Integer endPage, Clock clock) {
-        List<String> errors = new ArrayList<>();
-        if (endPage != null && endPage <= 0) errors.add("End page must be positive.");
-        if (endPage != null && startPage != null && endPage < startPage) errors.add("End page cannot be before start page.");
-        if (!errors.isEmpty()) throw new DomainValidationException("INVALID_SESSION_END", errors);
-
-        this.endPage = endPage;
-        this.endedAt = Instant.now(clock);
-        if (startedAt != null) {
-            this.durationMs = Duration.between(startedAt, endedAt).toMillis();
+    public void pause(int endPage, int durationMinutes, Clock clock) {
+        validateStateTransition(ReadingState.PAUSED);
+        if (endPage < startPage) {
+            throw new DomainValidationException("INVALID_PAGE_RANGE",
+                    List.of("End page must be >= start page."));
         }
-        markUpdated(endedAt, getId());
+        this.endPage = endPage;
+        this.durationMinutes = durationMinutes;
+        this.state = ReadingState.PAUSED;
+        markUpdated(Instant.now(clock), userId);
+    }
+
+    public void resume(int startPage, Clock clock) {
+        validateStateTransition(ReadingState.STARTED);
+        if (startPage > 0) this.startPage = startPage;
+        this.state = ReadingState.STARTED;
+        markUpdated(Instant.now(clock), userId);
+    }
+
+    public void finish(int endPage, int durationMinutes, Clock clock) {
+        if (endPage < startPage) {
+            throw new DomainValidationException("INVALID_PAGE_RANGE",
+                    List.of("End page must be >= start page."));
+        }
+        this.endPage = endPage;
+        this.durationMinutes = durationMinutes;
+        this.state = ReadingState.COMPLETED;
+        markUpdated(Instant.now(clock), userId);
+    }
+
+    public void cancel(Clock clock) {
+        this.state = ReadingState.CANCELLED;
+        markUpdated(Instant.now(clock), userId);
+    }
+
+    private void validateStateTransition(ReadingState target) {
+        if (this.state == ReadingState.COMPLETED) {
+            throw new DomainValidationException("INVALID_STATE",
+                    List.of("Cannot modify a completed session."));
+        }
+        if (this.state == ReadingState.CANCELLED) {
+            throw new DomainValidationException("INVALID_STATE",
+                    List.of("Cannot modify a cancelled session."));
+        }
+        if (target == ReadingState.PAUSED && this.state != ReadingState.STARTED) {
+            throw new DomainValidationException("INVALID_STATE",
+                    List.of("Only started sessions can be paused."));
+        }
+        if (target == ReadingState.STARTED && this.state != ReadingState.PAUSED) {
+            throw new DomainValidationException("INVALID_STATE",
+                    List.of("Only paused sessions can be resumed."));
+        }
     }
 
     public UUID getBookId() { return bookId; }
+    public UUID getUserId() { return userId; }
     public Integer getStartPage() { return startPage; }
     public Integer getEndPage() { return endPage; }
-    public Long getDurationMs() { return durationMs; }
-    public Instant getStartedAt() { return startedAt; }
-    public Instant getEndedAt() { return endedAt; }
-    public boolean isActive() { return endedAt == null; }
+    public Integer getDurationMinutes() { return durationMinutes; }
+    public ReadingState getState() { return state; }
 }

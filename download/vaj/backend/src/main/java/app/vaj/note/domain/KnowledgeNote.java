@@ -2,46 +2,38 @@ package app.vaj.note.domain;
 
 import app.vaj.common.domain.BaseAggregateRoot;
 import app.vaj.common.domain.DomainValidationException;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
 public class KnowledgeNote extends BaseAggregateRoot {
-
-    private UUID bookId;
+    private UUID userId;
     private String title;
     private String content;
-    private String type;
+    private NoteStatus status;
 
     private KnowledgeNote(UUID id) { super(id); }
 
-    public static KnowledgeNote create(UUID id, UUID bookId, String title, String content,
-                                        String type, UUID userId, Clock clock) {
-        List<String> errors = new ArrayList<>();
-        if (title == null || title.isBlank()) errors.add("Title is required.");
-        if (content == null || content.isBlank()) errors.add("Content is required.");
-        if (!errors.isEmpty()) throw new DomainValidationException("INVALID_NOTE", errors);
-
-        KnowledgeNote note = new KnowledgeNote(id);
-        note.bookId = bookId;
-        note.title = title;
-        note.content = content;
-        note.type = type != null ? type : "GENERAL";
-        note.markCreated(Instant.now(clock), userId);
-        return note;
+    public static KnowledgeNote create(UUID id, UUID userId, String title, String content, Clock clock) {
+        if (content == null || content.isBlank()) throw new DomainValidationException("EMPTY_CONTENT", List.of("Content is required."));
+        if (title != null && title.length() > 300) throw new DomainValidationException("LONG_TITLE", List.of("Title max 300 chars."));
+        KnowledgeNote n = new KnowledgeNote(id);
+        n.userId = userId; n.title = title; n.content = content; n.status = NoteStatus.DRAFT;
+        n.markCreated(Instant.now(clock), userId);
+        return n;
     }
 
-    public void update(String title, String content, UUID userId, Clock clock) {
-        if (title != null) this.title = title;
-        if (content != null) this.content = content;
+    public void update(String title, String content, Clock clock) {
+        if (title != null) { if (title.length() > 300) throw new DomainValidationException("LONG_TITLE", List.of("Max 300.")); this.title = title; }
+        if (content != null && !content.isBlank()) this.content = content;
         markUpdated(Instant.now(clock), userId);
     }
 
-    public UUID getBookId() { return bookId; }
+    public void publish(Clock clock) { this.status = NoteStatus.PUBLISHED; markUpdated(Instant.now(clock), userId); }
+    public void archive(Clock clock) { this.status = NoteStatus.ARCHIVED; markUpdated(Instant.now(clock), userId); }
+    public void delete(Clock clock) { this.status = NoteStatus.DELETED; markDeleted(Instant.now(clock), userId); }
+
+    public UUID getUserId() { return userId; }
     public String getTitle() { return title; }
     public String getContent() { return content; }
-    public String getType() { return type; }
+    public NoteStatus getStatus() { return status; }
 }

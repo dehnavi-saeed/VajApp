@@ -1,56 +1,60 @@
 package app.vaj.goal.api;
-
+import app.vaj.goal.application.command.CreateGoalCommand;
+import app.vaj.goal.application.dto.ReadingGoalResponse;
+import app.vaj.goal.application.handler.*;
 import app.vaj.common.application.dto.ApiResponse;
 import app.vaj.common.infrastructure.security.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/goals")
+@RequestMapping("/api/v1/reading-goals")
 @Tag(name = "Reading Goals", description = "Reading goal management")
 public class GoalController {
+    private final CreateGoalHandler createHandler;
+    private final PauseGoalHandler pauseHandler;
+    private final ResumeGoalHandler resumeHandler;
+    private final CancelGoalHandler cancelHandler;
+    private final ListGoalsHandler listHandler;
+
+    public GoalController(CreateGoalHandler createHandler, PauseGoalHandler pauseHandler,
+                         ResumeGoalHandler resumeHandler, CancelGoalHandler cancelHandler, ListGoalsHandler listHandler) {
+        this.createHandler = createHandler; this.pauseHandler = pauseHandler;
+        this.resumeHandler = resumeHandler; this.cancelHandler = cancelHandler; this.listHandler = listHandler;
+    }
 
     @GetMapping
-    @Operation(summary = "List user reading goals")
-    public ResponseEntity<ApiResponse<Object>> list(@AuthenticationPrincipal CurrentUser currentUser) {
-        return ResponseEntity.ok(ApiResponse.success(Map.of("goals", java.util.List.of())));
+    @Operation(summary = "List reading goals")
+    public ResponseEntity<ApiResponse<List<ReadingGoalResponse>>> list(@AuthenticationPrincipal CurrentUser user) {
+        return ResponseEntity.ok(ApiResponse.success(listHandler.handle(user.id())));
     }
 
     @PostMapping
-    @Operation(summary = "Create a reading goal")
-    public ResponseEntity<ApiResponse<Map<String, UUID>>> create(
-            @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestBody Map<String, Object> body) {
-        UUID id = UUID.randomUUID();
-        return ResponseEntity.ok(ApiResponse.success(Map.of("id", id)));
+    @Operation(summary = "Create reading goal")
+    public ResponseEntity<ApiResponse<ReadingGoalResponse>> create(
+            @AuthenticationPrincipal CurrentUser user, @Valid @RequestBody CreateGoalCommand cmd) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(createHandler.handle(user.id(), cmd)));
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Get goal details")
-    public ResponseEntity<ApiResponse<Object>> get(
-            @AuthenticationPrincipal CurrentUser currentUser,
-            @PathVariable UUID id) {
-        return ResponseEntity.ok(ApiResponse.success(Map.of("id", id, "progress", 0)));
+    @PostMapping("/{id}/pause")
+    public ResponseEntity<ApiResponse<ReadingGoalResponse>> pause(@PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.success(pauseHandler.handle(id)));
     }
 
-    @PatchMapping("/{id}/progress")
-    @Operation(summary = "Update goal progress")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> updateProgress(
-            @AuthenticationPrincipal CurrentUser currentUser,
-            @PathVariable UUID id,
-            @RequestBody Map<String, Integer> body) {
-        return ResponseEntity.ok(ApiResponse.success(Map.of("updated", true)));
+    @PostMapping("/{id}/resume")
+    public ResponseEntity<ApiResponse<ReadingGoalResponse>> resume(@PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.success(resumeHandler.handle(id)));
     }
 
-    @PostMapping("/{id}/abandon")
-    @Operation(summary = "Abandon a goal")
-    public ResponseEntity<ApiResponse<Void>> abandon(
-            @AuthenticationPrincipal CurrentUser currentUser,
-            @PathVariable UUID id) {
-        return ResponseEntity.ok(ApiResponse.success(null));
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<Void>> cancel(@PathVariable UUID id) {
+        cancelHandler.handle(id); return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

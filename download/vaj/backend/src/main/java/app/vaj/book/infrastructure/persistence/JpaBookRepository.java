@@ -14,4 +14,6 @@ public interface JpaBookRepository extends JpaRepository<BookEntity, UUID> {
     Page<BookEntity> findByLibraryIdAndIsDeletedFalse(UUID libraryId, Pageable pageable);
 
     Page<BookEntity> findByLibraryIdAndStatusAndIsDeletedFalse(UUID libraryId, String status, Pageable pageable);
+
+    long countByLibraryIdAndIsDeletedFalse(UUID libraryId);
 }
