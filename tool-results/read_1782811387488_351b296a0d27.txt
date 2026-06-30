@@ -1,0 +1,1773 @@
+     1→     1→# VAJ-BACKEND-CODEX.md
+     2→     2→
+     3→     3→Version: 2.0
+     4→     4→
+     5→     5→Status: Official
+     6→     6→
+     7→     7→---
+     8→     8→
+     9→     9→# Purpose
+    10→    10→
+    11→    11→This document defines every backend development rule for VAJ.
+    12→    12→
+    13→    13→Every AI assistant generating Java code MUST follow these rules.
+    14→    14→
+    15→    15→If generated code violates these rules,
+    16→    16→
+    17→    17→the generated code is considered incorrect.
+    18→    18→
+    19→    19→---
+    20→    20→
+    21→    21→# Backend Technology Stack
+    22→    22→
+    23→    23→Language
+    24→    24→
+    25→    25→Java 21 LTS
+    26→    26→
+    27→    27→Framework
+    28→    28→
+    29→    29→Spring Boot 3.x
+    30→    30→
+    31→    31→Architecture
+    32→    32→
+    33→    33→Spring Modulith
+    34→    34→
+    35→    35→Build Tool
+    36→    36→
+    37→    37→Maven
+    38→    38→
+    39→    39→Database
+    40→    40→
+    41→    41→SQL Server 2022
+    42→    42→
+    43→    43→Migration
+    44→    44→
+    45→    45→Flyway
+    46→    46→
+    47→    47→ORM
+    48→    48→
+    49→    49→Hibernate 6
+    50→    50→
+    51→    51→Spring Data JPA
+    52→    52→
+    53→    53→Mapper
+    54→    54→
+    55→    55→MapStruct
+    56→    56→
+    57→    57→Validation
+    58→    58→
+    59→    59→Jakarta Validation
+    60→    60→
+    61→    61→Security
+    62→    62→
+    63→    63→Spring Security
+    64→    64→
+    65→    65→JWT
+    66→    66→
+    67→    67→Refresh Token
+    68→    68→
+    69→    69→Documentation
+    70→    70→
+    71→    71→OpenAPI
+    72→    72→
+    73→    73→Testing
+    74→    74→
+    75→    75→JUnit 5
+    76→    76→
+    77→    77→Mockito
+    78→    78→
+    79→    79→Testcontainers
+    80→    80→
+    81→    81→ArchUnit
+    82→    82→
+    83→    83→---
+    84→    84→
+    85→    85→# Java Version
+    86→    86→
+    87→    87→Always target Java 21.
+    88→    88→
+    89→    89→Never use preview features.
+    90→    90→
+    91→    91→Prefer stable language features.
+    92→    92→
+    93→    93→Use:
+    94→    94→
+    95→    95→Records
+    96→    96→
+    97→    97→Sealed Classes
+    98→    98→
+    99→    99→Pattern Matching
+   100→   100→
+   101→   101→Virtual Threads only after explicit approval.
+   102→   102→
+   103→   103→---
+   104→   104→
+   105→   105→# Architectural Style
+   106→   106→
+   107→   107→Backend follows:
+   108→   108→
+   109→   109→DDD
+   110→   110→
+   111→   111→Clean Architecture
+   112→   112→
+   113→   113→CQRS-Friendly
+   114→   114→
+   115→   115→Modular Monolith
+   116→   116→
+   117→   117→Feature-Based Packaging
+   118→   118→
+   119→   119→No layered monolith.
+   120→   120→
+   121→   121→---
+   122→   122→
+   123→   123→# Package Structure
+   124→   124→
+   125→   125→app.vaj
+   126→   126→
+   127→   127→auth
+   128→   128→
+   129→   129→user
+   130→   130→
+   131→   131→library
+   132→   132→
+   133→   133→catalog
+   134→   134→
+   135→   135→reading
+   136→   136→
+   137→   137→knowledge
+   138→   138→
+   139→   139→analytics
+   140→   140→
+   141→   141→platform
+   142→   142→
+   143→   143→common
+   144→   144→
+   145→   145→Every Feature owns:
+   146→   146→
+   147→   147→api
+   148→   148→
+   149→   149→application
+   150→   150→
+   151→   151→domain
+   152→   152→
+   153→   153→infra
+   154→   154→
+   155→   155→No custom layouts.
+   156→   156→
+   157→   157→---
+   158→   158→
+   159→   159→# Dependency Rule
+   160→   160→
+   161→   161→Allowed
+   162→   162→
+   163→   163→API
+   164→   164→
+   165→   165→↓
+   166→   166→
+   167→   167→Application
+   168→   168→
+   169→   169→↓
+   170→   170→
+   171→   171→Domain
+   172→   172→
+   173→   173→Infrastructure
+   174→   174→
+   175→   175→↓
+   176→   176→
+   177→   177→Domain
+   178→   178→
+   179→   179→Forbidden
+   180→   180→
+   181→   181→Domain → Spring
+   182→   182→
+   183→   183→Domain → Hibernate
+   184→   184→
+   185→   185→Domain → JPA
+   186→   186→
+   187→   187→API → Repository
+   188→   188→
+   189→   189→Controller → Entity
+   190→   190→
+   191→   191→Entity → Repository
+   192→   192→
+   193→   193→---
+   194→   194→
+   195→   195→# Domain Rules
+   196→   196→
+   197→   197→The Domain is the most important layer.
+   198→   198→
+   199→   199→Business rules belong only here.
+   200→   200→
+   201→   201→The Domain has zero framework dependencies.
+   202→   202→
+   203→   203→Never import:
+   204→   204→
+   205→   205→Spring
+   206→   206→
+   207→   207→Hibernate
+   208→   208→
+   209→   209→Jackson
+   210→   210→
+   211→   211→MapStruct
+   212→   212→
+   213→   213→JPA
+   214→   214→
+   215→   215→Lombok
+   216→   216→
+   217→   217→inside Domain.
+   218→   218→
+   219→   219→---
+   220→   220→
+   221→   221→# Aggregate Rules
+   222→   222→
+   223→   223→Every Aggregate has one Aggregate Root.
+   224→   224→
+   225→   225→Aggregate Root protects invariants.
+   226→   226→
+   227→   227→Repositories load only Aggregate Roots.
+   228→   228→
+   229→   229→Never expose child Entities directly.
+   230→   230→
+   231→   231→Prefer small Aggregates.
+   232→   232→
+   233→   233→Reference external Aggregates only by Identifier.
+   234→   234→
+   235→   235→---
+   236→   236→
+   237→   237→# Entity Rules
+   238→   238→
+   239→   239→Entities have identity.
+   240→   240→
+   241→   241→Entities own behavior.
+   242→   242→
+   243→   243→Entities never become DTOs.
+   244→   244→
+   245→   245→Entities never become database models.
+   246→   246→
+   247→   247→Never expose Entities through REST.
+   248→   248→
+   249→   249→---
+   250→   250→
+   251→   251→# Value Object Rules
+   252→   252→
+   253→   253→Immutable.
+   254→   254→
+   255→   255→No identity.
+   256→   256→
+   257→   257→Equality by value.
+   258→   258→
+   259→   259→No setters.
+   260→   260→
+   261→   261→Examples
+   262→   262→
+   263→   263→BookTitle
+   264→   264→
+   265→   265→EmailAddress
+   266→   266→
+   267→   267→ISBN
+   268→   268→
+   269→   269→ReadingDuration
+   270→   270→
+   271→   271→ProgressPercentage
+   272→   272→
+   273→   273→Prefer Value Objects over primitives.
+   274→   274→
+   275→   275→---
+   276→   276→
+   277→   277→# Repository Rules
+   278→   278→
+   279→   279→Repository interfaces belong to Domain.
+   280→   280→
+   281→   281→JpaRepository implementations belong to Infrastructure.
+   282→   282→
+   283→   283→Repository responsibilities:
+   284→   284→
+   285→   285→Load Aggregate
+   286→   286→
+   287→   287→Save Aggregate
+   288→   288→
+   289→   289→Nothing else.
+   290→   290→
+   291→   291→Never implement business rules inside Repositories.
+   292→   292→
+   293→   293→---
+   294→   294→
+   295→   295→# Domain Service Rules
+   296→   296→
+   297→   297→Domain Services exist only when behavior does not naturally belong to one Aggregate.
+   298→   298→
+   299→   299→Avoid Service classes that only move logic out of Aggregates.
+   300→   300→
+   301→   301→Prefer rich Domain Models.
+   302→   302→
+   303→   303→---
+   304→   304→
+   305→   305→# Application Layer
+   306→   306→
+   307→   307→Responsible for:
+   308→   308→
+   309→   309→Use Cases
+   310→   310→
+   311→   311→Transactions
+   312→   312→
+   313→   313→Command Handling
+   314→   314→
+   315→   315→Query Handling
+   316→   316→
+   317→   317→Publishing Events
+   318→   318→
+   319→   319→Coordination
+   320→   320→
+   321→   321→Application Layer is NOT business logic.
+   322→   322→
+   323→   323→Business decisions belong to Domain.
+   324→   324→
+   325→   325→---
+   326→   326→
+   327→   327→# Infrastructure Layer
+   328→   328→
+   329→   329→Responsible for:
+   330→   330→
+   331→   331→Persistence
+   332→   332→
+   333→   333→Messaging
+   334→   334→
+   335→   335→External APIs
+   336→   336→
+   337→   337→Storage
+   338→   338→
+   339→   339→Search
+   340→   340→
+   341→   341→Security Adapters
+   342→   342→
+   343→   343→Configuration
+   344→   344→
+   345→   345→Infrastructure must never define business behavior.
+   346→   346→
+   347→   347→---
+   348→   348→
+   349→   349→# Controller Rules
+   350→   350→
+   351→   351→Controllers coordinate only.
+   352→   352→
+   353→   353→Controllers:
+   354→   354→
+   355→   355→Receive Request
+   356→   356→
+   357→   357→Validate Request
+   358→   358→
+   359→   359→Call Application
+   360→   360→
+   361→   361→Return Response
+   362→   362→
+   363→   363→Nothing more.
+   364→   364→
+   365→   365→Never
+   366→   366→
+   367→   367→Query Repository
+   368→   368→
+   369→   369→Call Entity
+   370→   370→
+   371→   371→Execute business logic
+   372→   372→
+   373→   373→Open transactions
+   374→   374→
+   375→   375→---
+   376→   376→
+   377→   377→# DTO Rules
+   378→   378→
+   379→   379→Always use DTOs.
+   380→   380→
+   381→   381→Never expose Domain.
+   382→   382→
+   383→   383→Never expose JPA Entity.
+   384→   384→
+   385→   385→Every endpoint uses:
+   386→   386→
+   387→   387→Request DTO
+   388→   388→
+   389→   389→Response DTO
+   390→   390→
+   391→   391→Validation DTO
+   392→   392→
+   393→   393→DTOs never contain business behavior.
+   394→   394→
+   395→   395→---
+   396→   396→
+   397→   397→# Validation Rules
+   398→   398→
+   399→   399→Syntax Validation
+   400→   400→
+   401→   401→↓
+   402→   402→
+   403→   403→API Layer
+   404→   404→
+   405→   405→Business Validation
+   406→   406→
+   407→   407→↓
+   408→   408→
+   409→   409→Domain
+   410→   410→
+   411→   411→Persistence Validation
+   412→   412→
+   413→   413→↓
+   414→   414→
+   415→   415→Infrastructure
+   416→   416→
+   417→   417→Never mix them.
+   418→   418→
+   419→   419→---
+   420→   420→
+   421→   421→# Exception Rules
+   422→   422→
+   423→   423→DomainException
+   424→   424→
+   425→   425→↓
+   426→   426→
+   427→   427→ApplicationException
+   428→   428→
+   429→   429→↓
+   430→   430→
+   431→   431→Problem Details
+   432→   432→
+   433→   433→Never expose stack traces.
+   434→   434→
+   435→   435→Never expose SQL exceptions.
+   436→   436→
+   437→   437→Always return meaningful error responses.
+   438→   438→
+   439→   439→---
+   440→   440→
+   441→   441→# Logging Rules
+   442→   442→
+   443→   443→Use SLF4J.
+   444→   444→
+   445→   445→Meaningful logs only.
+   446→   446→
+   447→   447→Never log:
+   448→   448→
+   449→   449→Passwords
+   450→   450→
+   451→   451→JWT Tokens
+   452→   452→
+   453→   453→Secrets
+   454→   454→
+   455→   455→Personal Sensitive Data
+   456→   456→
+   457→   457→Prefer structured logging.
+   458→   458→
+   459→   459→---
+   460→   460→
+   461→   461→# Coding Principles
+   462→   462→
+   463→   463→Readable > Clever
+   464→   464→
+   465→   465→Explicit > Implicit
+   466→   466→
+   467→   467→Simple > Complex
+   468→   468→
+   469→   469→Maintainable > Short
+   470→   470→
+   471→   471→Business Meaning > Technical Trick
+   472→   472→
+   473→   473→Every class should communicate intent immediately.
+   474→   474→
+   475→   475→# Spring Boot Rules
+   476→   476→
+   477→   477→## Spring Boot Version
+   478→   478→
+   479→   479→Always use the latest supported Spring Boot 3.x stable release.
+   480→   480→
+   481→   481→Never use deprecated APIs.
+   482→   482→
+   483→   483→Prefer Spring Boot conventions over custom configuration.
+   484→   484→
+   485→   485→---
+   486→   486→
+   487→   487→# Spring Modulith
+   488→   488→
+   489→   489→VAJ is a Modular Monolith.
+   490→   490→
+   491→   491→Every Feature is one logical module.
+   492→   492→
+   493→   493→Modules communicate through:
+   494→   494→
+   495→   495→- Application Services
+   496→   496→- Domain Events
+   497→   497→- Published Interfaces
+   498→   498→
+   499→   499→Never access another module's internal packages.
+   500→   500→
+   501→   501→Never bypass module boundaries.
+   502→   502→
+   503→   503→---
+   504→   504→
+   505→   505→# Configuration Rules
+   506→   506→
+   507→   507→Configuration belongs only in:
+   508→   508→
+   509→   509→config/
+   510→   510→
+   511→   511→Never place configuration classes inside feature packages.
+   512→   512→
+   513→   513→Use @Configuration only inside infrastructure or config modules.
+   514→   514→
+   515→   515→---
+   516→   516→
+   517→   517→# Dependency Injection
+   518→   518→
+   519→   519→Always use constructor injection.
+   520→   520→
+   521→   521→Never use field injection.
+   522→   522→
+   523→   523→Never use @Autowired on fields.
+   524→   524→
+   525→   525→Example
+   526→   526→
+   527→   527→Good
+   528→   528→
+   529→   529→public BookController(BookApplicationService service)
+   530→   530→
+   531→   531→Bad
+   532→   532→
+   533→   533→@Autowired
+   534→   534→private BookApplicationService service;
+   535→   535→
+   536→   536→---
+   537→   537→
+   538→   538→# Transactions
+   539→   539→
+   540→   540→Transactions belong only in the Application layer.
+   541→   541→
+   542→   542→Good
+   543→   543→
+   544→   544→Application Service
+   545→   545→
+   546→   546→↓
+   547→   547→
+   548→   548→@Transactional
+   549→   549→
+   550→   550→↓
+   551→   551→
+   552→   552→Aggregate
+   553→   553→
+   554→   554→Bad
+   555→   555→
+   556→   556→Controller
+   557→   557→
+   558→   558→↓
+   559→   559→
+   560→   560→@Transactional
+   561→   561→
+   562→   562→Repository
+   563→   563→
+   564→   564→↓
+   565→   565→
+   566→   566→@Transactional
+   567→   567→
+   568→   568→Domain
+   569→   569→
+   570→   570→↓
+   571→   571→
+   572→   572→@Transactional
+   573→   573→
+   574→   574→---
+   575→   575→
+   576→   576→# Persistence Rules
+   577→   577→
+   578→   578→Persistence is an implementation detail.
+   579→   579→
+   580→   580→Domain must never know JPA exists.
+   581→   581→
+   582→   582→Infrastructure maps between:
+   583→   583→
+   584→   584→Domain
+   585→   585→
+   586→   586→↓
+   587→   587→
+   588→   588→JPA Entity
+   589→   589→
+   590→   590→Never use JPA Entities outside Infrastructure.
+   591→   591→
+   592→   592→---
+   593→   593→
+   594→   594→# JPA Entity Rules
+   595→   595→
+   596→   596→JPA Entities exist only for persistence.
+   597→   597→
+   598→   598→JPA Entity != Domain Entity
+   599→   599→
+   600→   600→JPA Entity != API DTO
+   601→   601→
+   602→   602→Never expose JPA Entities.
+   603→   603→
+   604→   604→---
+   605→   605→
+   606→   606→# Mapping Rules
+   607→   607→
+   608→   608→Use MapStruct.
+   609→   609→
+   610→   610→Mappings allowed:
+   611→   611→
+   612→   612→Request DTO
+   613→   613→
+   614→   614→↓
+   615→   615→
+   616→   616→Domain
+   617→   617→
+   618→   618→Domain
+   619→   619→
+   620→   620→↓
+   621→   621→
+   622→   622→Response DTO
+   623→   623→
+   624→   624→Domain
+   625→   625→
+   626→   626→↓
+   627→   627→
+   628→   628→JpaEntity
+   629→   629→
+   630→   630→JpaEntity
+   631→   631→
+   632→   632→↓
+   633→   633→
+   634→   634→Domain
+   635→   635→
+   636→   636→Never map manually unless mapping contains business logic.
+   637→   637→
+   638→   638→---
+   639→   639→
+   640→   640→# Flyway Rules
+   641→   641→
+   642→   642→Every database change requires a Flyway migration.
+   643→   643→
+   644→   644→Never edit an executed migration.
+   645→   645→
+   646→   646→Never combine unrelated changes into one migration.
+   647→   647→
+   648→   648→Migration naming:
+   649→   649→
+   650→   650→V001\_\_Create_Books.sql
+   651→   651→
+   652→   652→V002\_\_Create_Authors.sql
+   653→   653→
+   654→   654→V003\_\_Add_Book_Cover.sql
+   655→   655→
+   656→   656→---
+   657→   657→
+   658→   658→# SQL Rules
+   659→   659→
+   660→   660→Always use explicit constraints.
+   661→   661→
+   662→   662→Always define indexes intentionally.
+   663→   663→
+   664→   664→Always use foreign keys when appropriate.
+   665→   665→
+   666→   666→Avoid database triggers.
+   667→   667→
+   668→   668→Avoid stored procedures unless explicitly required.
+   669→   669→
+   670→   670→---
+   671→   671→
+   672→   672→# Security Rules
+   673→   673→
+   674→   674→Authentication
+   675→   675→
+   676→   676→Spring Security
+   677→   677→
+   678→   678→Authorization
+   679→   679→
+   680→   680→Role Based
+   681→   681→
+   682→   682→Password Hashing
+   683→   683→
+   684→   684→BCrypt
+   685→   685→
+   686→   686→Session
+   687→   687→
+   688→   688→Stateless
+   689→   689→
+   690→   690→Token
+   691→   691→
+   692→   692→JWT Access Token
+   693→   693→
+   694→   694→Refresh Token
+   695→   695→
+   696→   696→---
+   697→   697→
+   698→   698→# Authentication Rules
+   699→   699→
+   700→   700→Controllers never authenticate manually.
+   701→   701→
+   702→   702→Spring Security handles authentication.
+   703→   703→
+   704→   704→Application receives authenticated UserId only.
+   705→   705→
+   706→   706→Never pass SecurityContext into Domain.
+   707→   707→
+   708→   708→---
+   709→   709→
+   710→   710→# Authorization Rules
+   711→   711→
+   712→   712→Authorization happens before entering the Domain.
+   713→   713→
+   714→   714→Domain assumes the caller is already authorized.
+   715→   715→
+   716→   716→Business permissions are validated inside the Domain when required.
+   717→   717→
+   718→   718→---
+   719→   719→
+   720→   720→# Password Rules
+   721→   721→
+   722→   722→Never store plain passwords.
+   723→   723→
+   724→   724→Never log passwords.
+   725→   725→
+   726→   726→Always hash using BCrypt.
+   727→   727→
+   728→   728→Never expose password hashes.
+   729→   729→
+   730→   730→---
+   731→   731→
+   732→   732→# JWT Rules
+   733→   733→
+   734→   734→Use short-lived Access Tokens.
+   735→   735→
+   736→   736→Use Refresh Tokens.
+   737→   737→
+   738→   738→Validate signature.
+   739→   739→
+   740→   740→Validate expiration.
+   741→   741→
+   742→   742→Never trust client claims without validation.
+   743→   743→
+   744→   744→---
+   745→   745→
+   746→   746→# Validation Rules
+   747→   747→
+   748→   748→Use Jakarta Validation for input validation.
+   749→   749→
+   750→   750→Examples:
+   751→   751→
+   752→   752→@NotBlank
+   753→   753→
+   754→   754→@NotNull
+   755→   755→
+   756→   756→@Email
+   757→   757→
+   758→   758→@Size
+   759→   759→
+   760→   760→Business validation belongs to Domain.
+   761→   761→
+   762→   762→---
+   763→   763→
+   764→   764→# API Design
+   765→   765→
+   766→   766→REST only.
+   767→   767→
+   768→   768→Plural resources.
+   769→   769→
+   770→   770→Examples:
+   771→   771→
+   772→   772→/books
+   773→   773→
+   774→   774→/authors
+   775→   775→
+   776→   776→/highlights
+   777→   777→
+   778→   778→/reading-sessions
+   779→   779→
+   780→   780→Use proper HTTP methods.
+   781→   781→
+   782→   782→GET
+   783→   783→
+   784→   784→POST
+   785→   785→
+   786→   786→PATCH
+   787→   787→
+   788→   788→DELETE
+   789→   789→
+   790→   790→---
+   791→   791→
+   792→   792→# Response Rules
+   793→   793→
+   794→   794→Always return DTOs.
+   795→   795→
+   796→   796→Never return:
+   797→   797→
+   798→   798→Entities
+   799→   799→
+   800→   800→JpaEntities
+   801→   801→
+   802→   802→Exceptions
+   803→   803→
+   804→   804→Stack traces
+   805→   805→
+   806→   806→Use consistent response structures.
+   807→   807→
+   808→   808→---
+   809→   809→
+   810→   810→# OpenAPI Rules
+   811→   811→
+   812→   812→Every endpoint must be documented.
+   813→   813→
+   814→   814→Every Request DTO documented.
+   815→   815→
+   816→   816→Every Response DTO documented.
+   817→   817→
+   818→   818→Every error documented.
+   819→   819→
+   820→   820→Swagger must always reflect the implementation.
+   821→   821→
+   822→   822→---
+   823→   823→
+   824→   824→# Error Handling
+   825→   825→
+   826→   826→Use RFC 9457 Problem Details.
+   827→   827→
+   828→   828→Every exception becomes a meaningful API response.
+   829→   829→
+   830→   830→Never expose internal implementation details.
+   831→   831→
+   832→   832→---
+   833→   833→
+   834→   834→# Auditing
+   835→   835→
+   836→   836→Every Aggregate supports auditing when required.
+   837→   837→
+   838→   838→Typical fields:
+   839→   839→
+   840→   840→CreatedAt
+   841→   841→
+   842→   842→CreatedBy
+   843→   843→
+   844→   844→UpdatedAt
+   845→   845→
+   846→   846→UpdatedBy
+   847→   847→
+   848→   848→DeletedAt
+   849→   849→
+   850→   850→DeletedBy
+   851→   851→
+   852→   852→Auditing is implemented in Infrastructure.
+   853→   853→
+   854→   854→---
+   855→   855→
+   856→   856→# Time Handling
+   857→   857→
+   858→   858→Never call LocalDateTime.now() directly inside Domain.
+   859→   859→
+   860→   860→Use a Clock abstraction.
+   861→   861→
+   862→   862→This improves testability.
+   863→   863→
+   864→   864→---
+   865→   865→
+   866→   866→# Identifier Rules
+   867→   867→
+   868→   868→Use UUID identifiers.
+   869→   869→
+   870→   870→Identifiers are immutable.
+   871→   871→
+   872→   872→Identifiers are generated by the Application layer unless business rules specify otherwise.
+   873→   873→
+   874→   874→---
+   875→   875→
+   876→   876→# File Storage
+   877→   877→
+   878→   878→Domain never knows where files are stored.
+   879→   879→
+   880→   880→Storage implementation belongs to Infrastructure.
+   881→   881→
+   882→   882→Possible implementations:
+   883→   883→
+   884→   884→Local
+   885→   885→
+   886→   886→S3 Compatible
+   887→   887→
+   888→   888→Azure Blob (Future)
+   889→   889→
+   890→   890→---
+   891→   891→
+   892→   892→# External Integrations
+   893→   893→
+   894→   894→Never call external APIs directly from the Domain.
+   895→   895→
+   896→   896→Always use interfaces.
+   897→   897→
+   898→   898→Infrastructure provides implementations.
+   899→   899→
+   900→   900→---
+   901→   901→
+   902→   902→# Background Jobs
+   903→   903→
+   904→   904→Background processing belongs to the Application layer.
+   905→   905→
+   906→   906→Business rules remain inside the Domain.
+   907→   907→
+   908→   908→Jobs must be idempotent whenever possible.
+   909→   909→
+   910→   910→---
+   911→   911→
+   912→   912→# Caching
+   913→   913→
+   914→   914→Cache only Read Models.
+   915→   915→
+   916→   916→Never cache Aggregates unless explicitly approved.
+   917→   917→
+   918→   918→Cache invalidation must be deterministic.
+   919→   919→
+   920→   920→---
+   921→   921→
+   922→   922→# General Principle
+   923→   923→
+   924→   924→Spring Boot is a framework.
+   925→   925→
+   926→   926→The framework supports the Domain.
+   927→   927→
+   928→   928→The Domain must never depend on the framework.
+   929→   929→
+   930→   930→# CQRS Implementation
+   931→   931→
+   932→   932→VAJ uses CQRS as an architectural guideline.
+   933→   933→
+   934→   934→CQRS is used to separate responsibilities.
+   935→   935→
+   936→   936→CQRS is NOT used to create unnecessary complexity.
+   937→   937→
+   938→   938→---
+   939→   939→
+   940→   940→# Command Side
+   941→   941→
+   942→   942→Commands represent user intent.
+   943→   943→
+   944→   944→Examples:
+   945→   945→
+   946→   946→CreateBookCommand
+   947→   947→
+   948→   948→UpdateBookCommand
+   949→   949→
+   950→   950→DeleteBookCommand
+   951→   951→
+   952→   952→StartReadingSessionCommand
+   953→   953→
+   954→   954→CompleteReadingSessionCommand
+   955→   955→
+   956→   956→CreateKnowledgeNoteCommand
+   957→   957→
+   958→   958→Commands contain data only.
+   959→   959→
+   960→   960→Commands never contain business logic.
+   961→   961→
+   962→   962→---
+   963→   963→
+   964→   964→# Command Handlers
+   965→   965→
+   966→   966→Each Command has exactly one Handler.
+   967→   967→
+   968→   968→Naming:
+   969→   969→
+   970→   970→CreateBookCommand
+   971→   971→
+   972→   972→↓
+   973→   973→
+   974→   974→CreateBookHandler
+   975→   975→
+   976→   976→Responsibilities:
+   977→   977→
+   978→   978→- Validate command
+   979→   979→- Load Aggregate
+   980→   980→- Execute business operation
+   981→   981→- Save Aggregate
+   982→   982→- Publish Domain Events
+   983→   983→
+   984→   984→Nothing else.
+   985→   985→
+   986→   986→---
+   987→   987→
+   988→   988→# Query Side
+   989→   989→
+   990→   990→Queries never modify state.
+   991→   991→
+   992→   992→Queries may use:
+   993→   993→
+   994→   994→Read Models
+   995→   995→
+   996→   996→Projections
+   997→   997→
+   998→   998→Database Views
+   999→   999→
+  1000→  1000→Optimized SQL
+  1001→  1001→
+  1002→  1002→Examples:
+  1003→  1003→
+  1004→  1004→GetBookQuery
+  1005→  1005→
+  1006→  1006→SearchBooksQuery
+  1007→  1007→
+  1008→  1008→GetDashboardQuery
+  1009→  1009→
+  1010→  1010→GetStatisticsQuery
+  1011→  1011→
+  1012→  1012→---
+  1013→  1013→
+  1014→  1014→# Query Handlers
+  1015→  1015→
+  1016→  1016→Each Query has exactly one Handler.
+  1017→  1017→
+  1018→  1018→Responsibilities:
+  1019→  1019→
+  1020→  1020→Read data
+  1021→  1021→
+  1022→  1022→Map Response
+  1023→  1023→
+  1024→  1024→Return DTO
+  1025→  1025→
+  1026→  1026→Never execute business rules.
+  1027→  1027→
+  1028→  1028→---
+  1029→  1029→
+  1030→  1030→# Domain Events
+  1031→  1031→
+  1032→  1032→Aggregates publish Events.
+  1033→  1033→
+  1034→  1034→Events describe facts.
+  1035→  1035→
+  1036→  1036→Events use past tense.
+  1037→  1037→
+  1038→  1038→Examples:
+  1039→  1039→
+  1040→  1040→BookCreated
+  1041→  1041→
+  1042→  1042→ReadingSessionCompleted
+  1043→  1043→
+  1044→  1044→HighlightCreated
+  1045→  1045→
+  1046→  1046→KnowledgeNoteCreated
+  1047→  1047→
+  1048→  1048→Never publish Events from Controllers.
+  1049→  1049→
+  1050→  1050→Never publish Events from Repositories.
+  1051→  1051→
+  1052→  1052→---
+  1053→  1053→
+  1054→  1054→# Event Publishing
+  1055→  1055→
+  1056→  1056→Events are published only after successful transaction commit.
+  1057→  1057→
+  1058→  1058→Failed transactions produce no Events.
+  1059→  1059→
+  1060→  1060→Events must be immutable.
+  1061→  1061→
+  1062→  1062→---
+  1063→  1063→
+  1064→  1064→# Policies
+  1065→  1065→
+  1066→  1066→Policies consume Events.
+  1067→  1067→
+  1068→  1068→Policies coordinate workflows.
+  1069→  1069→
+  1070→  1070→Policies execute Commands.
+  1071→  1071→
+  1072→  1072→Policies never modify Aggregates directly.
+  1073→  1073→
+  1074→  1074→Example:
+  1075→  1075→
+  1076→  1076→ReadingSessionCompleted
+  1077→  1077→
+  1078→  1078→↓
+  1079→  1079→
+  1080→  1080→UpdateReadingStateCommand
+  1081→  1081→
+  1082→  1082→↓
+  1083→  1083→
+  1084→  1084→EvaluateGoalCommand
+  1085→  1085→
+  1086→  1086→↓
+  1087→  1087→
+  1088→  1088→UpdateStatisticsProjectionCommand
+  1089→  1089→
+  1090→  1090→---
+  1091→  1091→
+  1092→  1092→# Projections
+  1093→  1093→
+  1094→  1094→Projections are read models.
+  1095→  1095→
+  1096→  1096→They:
+  1097→  1097→
+  1098→  1098→Never own business rules.
+  1099→  1099→
+  1100→  1100→May be rebuilt.
+  1101→  1101→
+  1102→  1102→Consume Events.
+  1103→  1103→
+  1104→  1104→Serve Queries.
+  1105→  1105→
+  1106→  1106→Examples:
+  1107→  1107→
+  1108→  1108→ReadingState
+  1109→  1109→
+  1110→  1110→Statistics
+  1111→  1111→
+  1112→  1112→Dashboard
+  1113→  1113→
+  1114→  1114→SearchIndex
+  1115→  1115→
+  1116→  1116→---
+  1117→  1117→
+  1118→  1118→# Event Ordering
+  1119→  1119→
+  1120→  1120→Ordering is guaranteed only inside one Aggregate.
+  1121→  1121→
+  1122→  1122→Never assume ordering across Aggregates.
+  1123→  1123→
+  1124→  1124→Consumers must be idempotent.
+  1125→  1125→
+  1126→  1126→---
+  1127→  1127→
+  1128→  1128→# Testing Strategy
+  1129→  1129→
+  1130→  1130→Every Feature requires:
+  1131→  1131→
+  1132→  1132→Aggregate Tests
+  1133→  1133→
+  1134→  1134→Application Tests
+  1135→  1135→
+  1136→  1136→Integration Tests
+  1137→  1137→
+  1138→  1138→Architecture Tests
+  1139→  1139→
+  1140→  1140→Controller Tests
+  1141→  1141→
+  1142→  1142→Mapper Tests
+  1143→  1143→
+  1144→  1144→---
+  1145→  1145→
+  1146→  1146→# Unit Testing
+  1147→  1147→
+  1148→  1148→Unit Tests verify business rules.
+  1149→  1149→
+  1150→  1150→Mock Infrastructure.
+  1151→  1151→
+  1152→  1152→Do not mock Domain behavior.
+  1153→  1153→
+  1154→  1154→Prefer testing Aggregates directly.
+  1155→  1155→
+  1156→  1156→---
+  1157→  1157→
+  1158→  1158→# Integration Testing
+  1159→  1159→
+  1160→  1160→Use Testcontainers.
+  1161→  1161→
+  1162→  1162→Never rely on developer machines.
+  1163→  1163→
+  1164→  1164→Database integration tests are mandatory for persistence logic.
+  1165→  1165→
+  1166→  1166→---
+  1167→  1167→
+  1168→  1168→# Architecture Testing
+  1169→  1169→
+  1170→  1170→Use ArchUnit.
+  1171→  1171→
+  1172→  1172→Verify:
+  1173→  1173→
+  1174→  1174→Package boundaries
+  1175→  1175→
+  1176→  1176→Dependency direction
+  1177→  1177→
+  1178→  1178→No Spring in Domain
+  1179→  1179→
+  1180→  1180→No JPA in Domain
+  1181→  1181→
+  1182→  1182→No forbidden imports
+  1183→  1183→
+  1184→  1184→Architecture violations fail the build.
+  1185→  1185→
+  1186→  1186→---
+  1187→  1187→
+  1188→  1188→# Performance Guidelines
+  1189→  1189→
+  1190→  1190→Correctness first.
+  1191→  1191→
+  1192→  1192→Performance second.
+  1193→  1193→
+  1194→  1194→Measure before optimizing.
+  1195→  1195→
+  1196→  1196→Prefer database indexes over premature caching.
+  1197→  1197→
+  1198→  1198→Cache only Query Models.
+  1199→  1199→
+  1200→  1200→---
+  1201→  1201→
+  1202→  1202→# Concurrency
+  1203→  1203→
+  1204→  1204→Aggregates should use optimistic locking when required.
+  1205→  1205→
+  1206→  1206→Avoid pessimistic locking unless justified.
+  1207→  1207→
+  1208→  1208→Business consistency belongs to Aggregates.
+  1209→  1209→
+  1210→  1210→---
+  1211→  1211→
+  1212→  1212→# Logging
+  1213→  1213→
+  1214→  1214→Log business events.
+  1215→  1215→
+  1216→  1216→Log failures.
+  1217→  1217→
+  1218→  1218→Log integrations.
+  1219→  1219→
+  1220→  1220→Never log secrets.
+  1221→  1221→
+  1222→  1222→Never log passwords.
+  1223→  1223→
+  1224→  1224→Never log JWT tokens.
+  1225→  1225→
+  1226→  1226→---
+  1227→  1227→
+  1228→  1228→# Review Checklist
+  1229→  1229→
+  1230→  1230→Before completing a Feature:
+  1231→  1231→
+  1232→  1232→[ ] Flyway migration created
+  1233→  1233→
+  1234→  1234→[ ] Aggregate implemented
+  1235→  1235→
+  1236→  1236→[ ] Value Objects immutable
+  1237→  1237→
+  1238→  1238→[ ] Repository interface in Domain
+  1239→  1239→
+  1240→  1240→[ ] Repository implementation in Infrastructure
+  1241→  1241→
+  1242→  1242→[ ] Command implemented
+  1243→  1243→
+  1244→  1244→[ ] Query implemented
+  1245→  1245→
+  1246→  1246→[ ] Event implemented
+  1247→  1247→
+  1248→  1248→[ ] Policy implemented (if needed)
+  1249→  1249→
+  1250→  1250→[ ] REST API implemented
+  1251→  1251→
+  1252→  1252→[ ] OpenAPI updated
+  1253→  1253→
+  1254→  1254→[ ] Angular contract verified
+  1255→  1255→
+  1256→  1256→[ ] Unit Tests passing
+  1257→  1257→
+  1258→  1258→[ ] Integration Tests passing
+  1259→  1259→
+  1260→  1260→[ ] Architecture Tests passing
+  1261→  1261→
+  1262→  1262→[ ] Documentation updated
+  1263→  1263→
+  1264→  1264→---
+  1265→  1265→
+  1266→  1266→# Code Smells
+  1267→  1267→
+  1268→  1268→Avoid:
+  1269→  1269→
+  1270→  1270→Large Aggregates
+  1271→  1271→
+  1272→  1272→Fat Controllers
+  1273→  1273→
+  1274→  1274→God Services
+  1275→  1275→
+  1276→  1276→Anemic Domain Models
+  1277→  1277→
+  1278→  1278→Business Logic in Repositories
+  1279→  1279→
+  1280→  1280→Business Logic in Controllers
+  1281→  1281→
+  1282→  1282→Duplicate Validation
+  1283→  1283→
+  1284→  1284→Primitive Obsession
+  1285→  1285→
+  1286→  1286→Feature Envy
+  1287→  1287→
+  1288→  1288→Long Parameter Lists
+  1289→  1289→
+  1290→  1290→Hidden Side Effects
+  1291→  1291→
+  1292→  1292→---
+  1293→  1293→
+  1294→  1294→# Definition of Backend Done
+  1295→  1295→
+  1296→  1296→Backend implementation is complete only when:
+  1297→  1297→
+  1298→  1298→✓ Business Rules implemented
+  1299→  1299→
+  1300→  1300→✓ DDD respected
+  1301→  1301→
+  1302→  1302→✓ Clean Architecture respected
+  1303→  1303→
+  1304→  1304→✓ CQRS respected
+  1305→  1305→
+  1306→  1306→✓ Events published correctly
+  1307→  1307→
+  1308→  1308→✓ Tests passing
+  1309→  1309→
+  1310→  1310→✓ Static analysis clean
+  1311→  1311→
+  1312→  1312→✓ Documentation updated
+  1313→  1313→
+  1314→  1314→✓ No architecture violations
+  1315→  1315→
+  1316→  1316→---
+  1317→  1317→
+  1318→  1318→# Final Backend Rule
+  1319→  1319→
+  1320→  1320→The Backend exists to protect the Domain.
+  1321→  1321→
+  1322→  1322→Frameworks are replaceable.
+  1323→  1323→
+  1324→  1324→Business rules are not.
+  1325→  1325→
+  1326→  1326→Always optimize for long-term maintainability.
+  1327→  1327→
+  1328→  1328→# Enterprise Development Rules
+  1329→  1329→
+  1330→  1330→The backend is expected to live for many years.
+  1331→  1331→
+  1332→  1332→Every implementation must prioritize:
+  1333→  1333→
+  1334→  1334→Correctness
+  1335→  1335→
+  1336→  1336→↓
+  1337→  1337→
+  1338→  1338→Maintainability
+  1339→  1339→
+  1340→  1340→↓
+  1341→  1341→
+  1342→  1342→Readability
+  1343→  1343→
+  1344→  1344→↓
+  1345→  1345→
+  1346→  1346→Scalability
+  1347→  1347→
+  1348→  1348→↓
+  1349→  1349→
+  1350→  1350→Performance
+  1351→  1351→
+  1352→  1352→Never reverse this order.
+  1353→  1353→
+  1354→  1354→---
+  1355→  1355→
+  1356→  1356→# SOLID Principles
+  1357→  1357→
+  1358→  1358→Every implementation must follow:
+  1359→  1359→
+  1360→  1360→Single Responsibility Principle
+  1361→  1361→
+  1362→  1362→Open / Closed Principle
+  1363→  1363→
+  1364→  1364→Liskov Substitution Principle
+  1365→  1365→
+  1366→  1366→Interface Segregation Principle
+  1367→  1367→
+  1368→  1368→Dependency Inversion Principle
+  1369→  1369→
+  1370→  1370→Violations require architectural justification.
+  1371→  1371→
+  1372→  1372→---
+  1373→  1373→
+  1374→  1374→# DRY Principle
+  1375→  1375→
+  1376→  1376→Avoid duplicated business logic.
+  1377→  1377→
+  1378→  1378→Reuse Domain concepts.
+  1379→  1379→
+  1380→  1380→Do not duplicate validation.
+  1381→  1381→
+  1382→  1382→Do not duplicate mapping.
+  1383→  1383→
+  1384→  1384→Shared business behavior belongs inside the Domain.
+  1385→  1385→
+  1386→  1386→---
+  1387→  1387→
+  1388→  1388→# KISS Principle
+  1389→  1389→
+  1390→  1390→Prefer the simplest implementation.
+  1391→  1391→
+  1392→  1392→Avoid unnecessary abstractions.
+  1393→  1393→
+  1394→  1394→Avoid generic frameworks inside the project.
+  1395→  1395→
+  1396→  1396→Avoid speculative architecture.
+  1397→  1397→
+  1398→  1398→---
+  1399→  1399→
+  1400→  1400→# YAGNI Principle
+  1401→  1401→
+  1402→  1402→Implement only what is required.
+  1403→  1403→
+  1404→  1404→Do not build future features.
+  1405→  1405→
+  1406→  1406→Do not create extension points without business justification.
+  1407→  1407→
+  1408→  1408→---
+  1409→  1409→
+  1410→  1410→# Code Style
+  1411→  1411→
+  1412→  1412→Methods should be small.
+  1413→  1413→
+  1414→  1414→Classes should have one responsibility.
+  1415→  1415→
+  1416→  1416→Public APIs should be explicit.
+  1417→  1417→
+  1418→  1418→Private methods should improve readability.
+  1419→  1419→
+  1420→  1420→Meaningful names are mandatory.
+  1421→  1421→
+  1422→  1422→Avoid abbreviations.
+  1423→  1423→
+  1424→  1424→---
+  1425→  1425→
+  1426→  1426→# Method Rules
+  1427→  1427→
+  1428→  1428→Prefer methods under 30 lines.
+  1429→  1429→
+  1430→  1430→Extract business concepts into methods.
+  1431→  1431→
+  1432→  1432→Avoid deeply nested conditions.
+  1433→  1433→
+  1434→  1434→Return early when appropriate.
+  1435→  1435→
+  1436→  1436→One method should express one intention.
+  1437→  1437→
+  1438→  1438→---
+  1439→  1439→
+  1440→  1440→# Class Rules
+  1441→  1441→
+  1442→  1442→One class.
+  1443→  1443→
+  1444→  1444→One responsibility.
+  1445→  1445→
+  1446→  1446→Avoid Utility classes for business logic.
+  1447→  1447→
+  1448→  1448→Avoid static business methods.
+  1449→  1449→
+  1450→  1450→Avoid God Classes.
+  1451→  1451→
+  1452→  1452→---
+  1453→  1453→
+  1454→  1454→# Dependency Rules
+  1455→  1455→
+  1456→  1456→High-level modules never depend on low-level implementations.
+  1457→  1457→
+  1458→  1458→Depend on abstractions.
+  1459→  1459→
+  1460→  1460→Infrastructure depends on Domain.
+  1461→  1461→
+  1462→  1462→Domain depends on nothing.
+  1463→  1463→
+  1464→  1464→---
+  1465→  1465→
+  1466→  1466→# Security Checklist
+  1467→  1467→
+  1468→  1468→Before completing any Feature verify:
+  1469→  1469→
+  1470→  1470→[ ] Authentication required
+  1471→  1471→
+  1472→  1472→[ ] Authorization verified
+  1473→  1473→
+  1474→  1474→[ ] Input validated
+  1475→  1475→
+  1476→  1476→[ ] Output sanitized
+  1477→  1477→
+  1478→  1478→[ ] Secrets protected
+  1479→  1479→
+  1480→  1480→[ ] Sensitive data not logged
+  1481→  1481→
+  1482→  1482→[ ] JWT validated
+  1483→  1483→
+  1484→  1484→[ ] SQL Injection prevented
+  1485→  1485→
+  1486→  1486→[ ] XSS considered
+  1487→  1487→
+  1488→  1488→[ ] CSRF strategy documented (if applicable)
+  1489→  1489→
+  1490→  1490→---
+  1491→  1491→
+  1492→  1492→# Performance Checklist
+  1493→  1493→
+  1494→  1494→Before optimization ask:
+  1495→  1495→
+  1496→  1496→Is it measurable?
+  1497→  1497→
+  1498→  1498→Is it necessary?
+  1499→  1499→
+  1500→  1500→Is it repeatable?
+  1501→  1501→
+  1502→  1502→Do not optimize prematurely.
+  1503→  1503→
+  1504→  1504→Prefer indexes before caching.
+  1505→  1505→
+  1506→  1506→Prefer projections before complex joins.
+  1507→  1507→
+  1508→  1508→Prefer simple code over micro-optimizations.
+  1509→  1509→
+  1510→  1510→---
+  1511→  1511→
+  1512→  1512→# Database Checklist
+  1513→  1513→
+  1514→  1514→Every persistence change must verify:
+  1515→  1515→
+  1516→  1516→[ ] Flyway migration exists
+  1517→  1517→
+  1518→  1518→[ ] Constraints defined
+  1519→  1519→
+  1520→  1520→[ ] Foreign keys reviewed
+  1521→  1521→
+  1522→  1522→[ ] Indexes reviewed
+  1523→  1523→
+  1524→  1524→[ ] Rollback strategy considered
+  1525→  1525→
+  1526→  1526→[ ] Naming conventions respected
+  1527→  1527→
+  1528→  1528→---
+  1529→  1529→
+  1530→  1530→# API Checklist
+  1531→  1531→
+  1532→  1532→Every endpoint must verify:
+  1533→  1533→
+  1534→  1534→[ ] RESTful URL
+  1535→  1535→
+  1536→  1536→[ ] Request DTO
+  1537→  1537→
+  1538→  1538→[ ] Response DTO
+  1539→  1539→
+  1540→  1540→[ ] Validation
+  1541→  1541→
+  1542→  1542→[ ] OpenAPI documentation
+  1543→  1543→
+  1544→  1544→[ ] Correct HTTP Status
+  1545→  1545→
+  1546→  1546→[ ] RFC 9457 Problem Details
+  1547→  1547→
+  1548→  1548→[ ] Pagination (if applicable)
+  1549→  1549→
+  1550→  1550→[ ] Sorting (if applicable)
+  1551→  1551→
+  1552→  1552→[ ] Filtering (if applicable)
+  1553→  1553→
+  1554→  1554→---
+  1555→  1555→
+  1556→  1556→# Testing Checklist
+  1557→  1557→
+  1558→  1558→Every Feature must include:
+  1559→  1559→
+  1560→  1560→[ ] Aggregate Tests
+  1561→  1561→
+  1562→  1562→[ ] Application Tests
+  1563→  1563→
+  1564→  1564→[ ] Integration Tests
+  1565→  1565→
+  1566→  1566→[ ] Controller Tests
+  1567→  1567→
+  1568→  1568→[ ] Mapper Tests
+  1569→  1569→
+  1570→  1570→[ ] Architecture Tests
+  1571→  1571→
+  1572→  1572→Coverage should prioritize business rules, not arbitrary percentages.
+  1573→  1573→
+  1574→  1574→---
+  1575→  1575→
+  1576→  1576→# Static Analysis
+  1577→  1577→
+  1578→  1578→Code must pass:
+  1579→  1579→
+  1580→  1580→Compilation
+  1581→  1581→
+  1582→  1582→Unit Tests
+  1583→  1583→
+  1584→  1584→Integration Tests
+  1585→  1585→
+  1586→  1586→ArchUnit
+  1587→  1587→
+  1588→  1588→Formatting
+  1589→  1589→
+  1590→  1590→Checkstyle (if enabled)
+  1591→  1591→
+  1592→  1592→SpotBugs/Sonar (if enabled)
+  1593→  1593→
+  1594→  1594→No critical issues.
+  1595→  1595→
+  1596→  1596→---
+  1597→  1597→
+  1598→  1598→# AI Coding Rules
+  1599→  1599→
+  1600→  1600→When generating code:
+  1601→  1601→
+  1602→  1602→Generate complete implementations.
+  1603→  1603→
+  1604→  1604→Never generate placeholder methods.
+  1605→  1605→
+  1606→  1606→Never generate TODO comments.
+  1607→  1607→
+  1608→  1608→Never leave unreachable code.
+  1609→  1609→
+  1610→  1610→Never suppress warnings without justification.
+  1611→  1611→
+  1612→  1612→Never ignore exceptions silently.
+  1613→  1613→
+  1614→  1614→Always explain architectural decisions when requested.
+  1615→  1615→
+  1616→  1616→---
+  1617→  1617→
+  1618→  1618→# AI Refactoring Rules
+  1619→  1619→
+  1620→  1620→Refactoring is allowed only if:
+  1621→  1621→
+  1622→  1622→Behavior is preserved.
+  1623→  1623→
+  1624→  1624→Tests remain green.
+  1625→  1625→
+  1626→  1626→Architecture improves.
+  1627→  1627→
+  1628→  1628→Readability improves.
+  1629→  1629→
+  1630→  1630→No public contract is broken.
+  1631→  1631→
+  1632→  1632→Otherwise, do not refactor.
+  1633→  1633→
+  1634→  1634→---
+  1635→  1635→
+  1636→  1636→# Backend Anti Patterns
+  1637→  1637→
+  1638→  1638→Never create:
+  1639→  1639→
+  1640→  1640→Fat Controllers
+  1641→  1641→
+  1642→  1642→Fat Services
+  1643→  1643→
+  1644→  1644→God Objects
+  1645→  1645→
+  1646→  1646→Anemic Domain Models
+  1647→  1647→
+  1648→  1648→Chatty Repositories
+  1649→  1649→
+  1650→  1650→Shared Mutable State
+  1651→  1651→
+  1652→  1652→Circular Dependencies
+  1653→  1653→
+  1654→  1654→Business Logic in Controllers
+  1655→  1655→
+  1656→  1656→Business Logic in Repositories
+  1657→  1657→
+  1658→  1658→Business Logic in DTOs
+  1659→  1659→
+  1660→  1660→Business Logic in Mappers
+  1661→  1661→
+  1662→  1662→Framework-dependent Domain Models
+  1663→  1663→
+  1664→  1664→---
+  1665→  1665→
+  1666→  1666→# Review Contract
+  1667→  1667→
+  1668→  1668→Before opening a Pull Request verify:
+  1669→  1669→
+  1670→  1670→Architecture
+  1671→  1671→
+  1672→  1672→[ ] DDD respected
+  1673→  1673→
+  1674→  1674→[ ] Clean Architecture respected
+  1675→  1675→
+  1676→  1676→[ ] CQRS respected
+  1677→  1677→
+  1678→  1678→[ ] Module boundaries respected
+  1679→  1679→
+  1680→  1680→Code
+  1681→  1681→
+  1682→  1682→[ ] Readable
+  1683→  1683→
+  1684→  1684→[ ] Consistent
+  1685→  1685→
+  1686→  1686→[ ] No duplication
+  1687→  1687→
+  1688→  1688→[ ] No dead code
+  1689→  1689→
+  1690→  1690→[ ] No unnecessary abstraction
+  1691→  1691→
+  1692→  1692→Testing
+  1693→  1693→
+  1694→  1694→[ ] Unit Tests pass
+  1695→  1695→
+  1696→  1696→[ ] Integration Tests pass
+  1697→  1697→
+  1698→  1698→[ ] Architecture Tests pass
+  1699→  1699→
+  1700→  1700→Documentation
+  1701→  1701→
+  1702→  1702→[ ] OpenAPI updated
+  1703→  1703→
+  1704→  1704→[ ] Feature documentation updated
+  1705→  1705→
+  1706→  1706→[ ] BuildOrder progress updated
+  1707→  1707→
+  1708→  1708→Deployment
+  1709→  1709→
+  1710→  1710→[ ] Flyway migration reviewed
+  1711→  1711→
+  1712→  1712→[ ] Configuration reviewed
+  1713→  1713→
+  1714→  1714→[ ] No environment-specific code
+  1715→  1715→
+  1716→  1716→---
+  1717→  1717→
+  1718→  1718→# Engineering Principles
+  1719→  1719→
+  1720→  1720→The framework serves the Domain.
+  1721→  1721→
+  1722→  1722→The database serves the Domain.
+  1723→  1723→
+  1724→  1724→The API serves the Domain.
+  1725→  1725→
+  1726→  1726→The UI serves the Domain.
+  1727→  1727→
+  1728→  1728→Everything exists to protect business rules.
+  1729→  1729→
+  1730→  1730→---
+  1731→  1731→
+  1732→  1732→# Final Backend Contract
+  1733→  1733→
+  1734→  1734→Every generated backend implementation must comply with:
+  1735→  1735→
+  1736→  1736→VAJ-CODEX.md
+  1737→  1737→
+  1738→  1738→VAJ-BACKEND-CODEX.md
+  1739→  1739→
+  1740→  1740→BuildOrder.md
+  1741→  1741→
+  1742→  1742→Feature Specification
+  1743→  1743→
+  1744→  1744→Current Task
+  1745→  1745→
+  1746→  1746→If any conflict exists:
+  1747→  1747→
+  1748→  1748→Priority:
+  1749→  1749→
+  1750→  1750→1. Current Task
+  1751→  1751→
+  1752→  1752→2. Feature Specification
+  1753→  1753→
+  1754→  1754→3. BuildOrder
+  1755→  1755→
+  1756→  1756→4. VAJ-BACKEND-CODEX.md
+  1757→  1757→
+  1758→  1758→5. VAJ-CODEX.md
+  1759→  1759→
+  1760→  1760→Never violate a higher priority document.
+  1761→  1761→
+  1762→  1762→---
+  1763→  1763→
+  1764→  1764→# Final Engineering Principle
+  1765→  1765→
+  1766→  1766→Good software solves today's problem.
+  1767→  1767→
+  1768→  1768→Great software solves today's problem without making tomorrow's problem harder.
+  1769→  1769→
+  1770→  1770→VAJ is built for long-term evolution.
+  1771→  1771→
+  1772→  1772→End of Document.
+  1773→  1773→

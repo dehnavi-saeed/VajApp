@@ -1,0 +1,41 @@
+-- V002__Create_Auth_Tables.sql
+CREATE TABLE RefreshTokens (
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    Token NVARCHAR(500) NOT NULL,
+    ExpiresAt DATETIME2 NOT NULL,
+    RevokedAt DATETIME2 NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT PK_RefreshTokens PRIMARY KEY (Id),
+    CONSTRAINT FK_RefreshTokens_Users FOREIGN KEY (UserId) REFERENCES Users(Id)
+);
+
+CREATE TABLE LoginSessions (
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    IpAddress NVARCHAR(50) NULL,
+    UserAgent NVARCHAR(500) NULL,
+    LoggedInAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    LoggedOutAt DATETIME2 NULL,
+    IsActive BIT NOT NULL DEFAULT 1,
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT PK_LoginSessions PRIMARY KEY (Id),
+    CONSTRAINT FK_LoginSessions_Users FOREIGN KEY (UserId) REFERENCES Users(Id)
+);
+
+CREATE TABLE PasswordResetTokens (
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+    UserId UNIQUEIDENTIFIER NOT NULL,
+    Token NVARCHAR(500) NOT NULL,
+    ExpiresAt DATETIME2 NOT NULL,
+    UsedAt DATETIME2 NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT PK_PasswordResetTokens PRIMARY KEY (Id),
+    CONSTRAINT FK_PasswordResetTokens_Users FOREIGN KEY (UserId) REFERENCES Users(Id)
+);
+
+CREATE INDEX IX_RefreshTokens_UserId ON RefreshTokens (UserId);
+CREATE INDEX IX_RefreshTokens_Token ON RefreshTokens (Token);
+CREATE INDEX IX_LoginSessions_UserId ON LoginSessions (UserId);
+CREATE INDEX IX_PasswordResetTokens_Token ON PasswordResetTokens (Token);
+CREATE INDEX IX_PasswordResetTokens_UserId ON PasswordResetTokens (UserId);

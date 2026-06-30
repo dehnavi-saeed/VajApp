@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:tc:sqlserver:///vaj_test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+jwt:
+  secret: dGVzdC1zZWNyZXQta2V5LXRoYXQtaXMtbG9uZy1lbm91Z2gtZm9yLWhtYWMtc2hhMjU2
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000
