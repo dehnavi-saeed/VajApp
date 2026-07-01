@@ -74,7 +74,7 @@ public abstract class BaseAggregateRoot implements Auditable {
         this.updatedBy = userId;
     }
 
-    protected void registerEvent(Object event) {
+    public void registerEvent(Object event) {
         domainEvents.add(event);
     }
 

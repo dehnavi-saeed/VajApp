@@ -1,6 +1,7 @@
 package app.vaj.auth.infrastructure.security;
 
 import app.vaj.common.infrastructure.security.CurrentUser;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
