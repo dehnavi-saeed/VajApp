@@ -2,8 +2,8 @@ package app.vaj.auth.infrastructure.persistence;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SoftDelete;
-import org.hibernate.annotations.SoftDeleteType;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -14,7 +14,8 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SoftDelete(type = SoftDeleteType.HARD, columnName = "IsDeleted")
+@SQLDelete(sql = "UPDATE Users SET IsDeleted = 1 WHERE Id = ?")
+@Where(clause = "IsDeleted = 0")
 public class UserAuthEntity {
 
     @Id

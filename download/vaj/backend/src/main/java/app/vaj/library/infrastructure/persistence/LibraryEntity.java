@@ -27,7 +27,7 @@ public class LibraryEntity {
     @Column(name = "UpdatedBy") private UUID updatedBy;
     @Column(name = "DeletedAt") private Instant deletedAt;
     @Column(name = "DeletedBy") private UUID deletedBy;
-    @Column(name = "IsDeleted", nullable = false) private boolean isDeleted;
+    @Column(name = "IsDeleted", nullable = false) private boolean deleted;
     @Version @Column(name = "Version") private Long version;
 
     public enum LibraryStatusJpa { ACTIVE, ARCHIVED, DELETED }

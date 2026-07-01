@@ -52,8 +52,7 @@ CREATE TABLE Collections (
     DeletedAt DATETIME2 NULL,
     DeletedBy UNIQUEIDENTIFIER NULL,
     IsDeleted BIT NOT NULL DEFAULT 0,
-    Version ROWVERSION NOT NULL,
-    CONSTRAINT UQ_Collections_UserId_Name WHERE IsDeleted = 0 UNIQUE (UserId, Name)
+    Version ROWVERSION NOT NULL
 );
 CREATE NONCLUSTERED INDEX IX_Collections_UserId ON Collections(UserId) WHERE IsDeleted = 0;
 
@@ -82,8 +81,7 @@ CREATE TABLE Tags (
     DeletedAt DATETIME2 NULL,
     DeletedBy UNIQUEIDENTIFIER NULL,
     IsDeleted BIT NOT NULL DEFAULT 0,
-    Version ROWVERSION NOT NULL,
-    CONSTRAINT UQ_Tags_UserId_Name WHERE IsDeleted = 0 UNIQUE (UserId, Name)
+    Version ROWVERSION NOT NULL
 );
 CREATE NONCLUSTERED INDEX IX_Tags_UserId ON Tags(UserId) WHERE IsDeleted = 0;
 
@@ -118,3 +116,11 @@ CREATE TABLE KnowledgeNoteHighlights (
     CONSTRAINT FK_KnowledgeNoteHighlights_Highlights FOREIGN KEY (HighlightId) REFERENCES Highlights(Id),
     CONSTRAINT PK_KnowledgeNoteHighlights PRIMARY KEY (NoteId, HighlightId)
 );
+
+CREATE UNIQUE INDEX UQ_Collections_UserId_Name
+    ON Collections(UserId, Name)
+    WHERE IsDeleted = 0;
+
+CREATE UNIQUE INDEX UQ_Tags_UserId_Name
+    ON Tags(UserId, Name)
+    WHERE IsDeleted = 0;

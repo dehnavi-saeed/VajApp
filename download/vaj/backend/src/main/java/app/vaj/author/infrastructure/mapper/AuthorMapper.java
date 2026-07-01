@@ -18,7 +18,7 @@ public interface AuthorMapper {
 
     @Mapping(target = "type", source = "type", qualifiedByName = "typeToString")
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
-    @Mapping(target = "isDeleted", source = ".", qualifiedByName = "isDeletedCheck")
+    @Mapping(target = "deleted", source = ".", qualifiedByName = "isDeletedCheck")
     AuthorEntity toEntity(Author author);
 
     @Named("typeToString")

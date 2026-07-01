@@ -40,7 +40,7 @@ public class AuthorEntity {
     private Instant deletedAt;
 
     @Column(name = "IsDeleted", nullable = false)
-    private boolean isDeleted;
+    private boolean deleted;
 
     @Version
     @Column(name = "Version")

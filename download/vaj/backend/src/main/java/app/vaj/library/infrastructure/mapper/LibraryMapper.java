@@ -18,12 +18,12 @@ public interface LibraryMapper {
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
     LibraryResponse toResponse(Library library);
 
-    @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
+    @Mapping(target = "status", source = "library.status", qualifiedByName = "statusToString")
     @Mapping(target = "bookCount", source = "bookCount")
     LibraryDetailResponse toDetailResponse(Library library, long bookCount);
 
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToJpaEnum")
-    @Mapping(target = "isDeleted", source = ".", qualifiedByName = "isDeletedCheck")
+    @Mapping(target = "deleted", source = ".", qualifiedByName = "isDeletedCheck")
     LibraryEntity toEntity(Library library);
 
     @ObjectFactory
