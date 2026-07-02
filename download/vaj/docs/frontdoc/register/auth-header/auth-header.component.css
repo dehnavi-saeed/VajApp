@@ -1,0 +1,12 @@
+/* ---- VAJ golden-gradient logo text ---- */
+.vaj-logo {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  line-height: 1;
+  background: linear-gradient(135deg, #F3C969 0%, #E8B84D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}

@@ -1,0 +1,137 @@
+/* =========================================================================
+   VAJ — RegisterCardComponent
+   Glass-morphism card with entrance animation & hover glow
+   ========================================================================= */
+
+/* ---------- outer container ---------- */
+.register-card-glass {
+  --card-bg: rgba(17, 27, 46, 0.92);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-border-hover: rgba(243, 201, 105, 0.15);
+  --card-radius: 28px;
+  --card-max-w: 520px;
+  --text-primary: #eef4ff;
+  --accent-primary: #f3c969;
+
+  width: 100%;
+  max-width: var(--card-max-w);
+  margin-inline: auto;
+  border-radius: var(--card-radius);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* entrance animation */
+  animation: cardEntrance 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  /* smooth border transition on hover */
+  transition:
+    border-color 320ms ease,
+    box-shadow 320ms ease;
+
+  /* hide default scrollbar in modern browsers */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+/* ---------- hover glow ---------- */
+.register-card-glass:hover {
+  border-color: var(--card-border-hover);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.28),
+    0 0 40px rgba(243, 201, 105, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* ---------- inner padded, scrollable wrapper ---------- */
+.register-card-glass__inner {
+  padding: 2.5rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+
+  max-height: calc(100dvh - 3rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  /* custom thin scrollbar — webkit */
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+}
+
+/* ---------- entrance keyframe ---------- */
+@keyframes cardEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ---------- responsive adjustments ---------- */
+
+/* tablets & smaller desktops */
+@media (max-width: 1024px) {
+  .register-card-glass__inner {
+    padding: 2rem 1.5rem 1.5rem;
+    gap: 1.5rem;
+  }
+}
+
+/* large phones / small tablets */
+@media (max-width: 640px) {
+  .register-card-glass {
+    --card-radius: 20px;
+    border-radius: var(--card-radius);
+    max-width: 100%;
+    margin-inline: 0.75rem;
+  }
+
+  .register-card-glass__inner {
+    padding: 1.75rem 1.25rem 1.25rem;
+    gap: 1.25rem;
+    max-height: calc(100dvh - 2rem);
+  }
+}
+
+/* very small phones */
+@media (max-width: 380px) {
+  .register-card-glass {
+    --card-radius: 16px;
+    border-radius: var(--card-radius);
+    margin-inline: 0.5rem;
+  }
+
+  .register-card-glass__inner {
+    padding: 1.5rem 1rem 1rem;
+    gap: 1rem;
+  }
+}
+
+/* ---------- prefers-reduced-motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .register-card-glass {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .register-card-glass:hover {
+    transition: none;
+  }
+}

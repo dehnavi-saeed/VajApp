@@ -1,0 +1,369 @@
+<!-- ═══════════════════════════════════════════════════════════════════
+     VAJ Register Form Component — RTL Persian
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="vaj-register-form" dir="rtl">
+
+  <!-- ─── SUCCESS STATE ─── -->
+  @if (isSuccess()) {
+    <div class="vaj-success-root">
+      <div class="vaj-success-checkmark-wrapper">
+        <svg class="vaj-success-checkmark" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+          <circle class="vaj-success-circle" cx="40" cy="40" r="36" fill="none" stroke="#F3C969" stroke-width="3" />
+          <polyline class="vaj-success-polyline" points="24 42 35 53 56 30" fill="none" stroke="#F3C969" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <h2 class="vaj-success-title">ثبت‌نام با موفقیت انجام شد!</h2>
+      <p class="vaj-success-subtitle">در حال انتقال...</p>
+    </div>
+  }
+
+  <!-- ─── FORM STATE ─── -->
+  @if (!isSuccess()) {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      class="vaj-form-root"
+      novalidate
+      autocomplete="off"
+    >
+
+      <!-- ─── GLASS ERROR ALERT ─── -->
+      @if (showErrorAlert()) {
+        <div class="vaj-error-alert">
+          <div class="vaj-error-alert-content">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <span class="vaj-error-alert-text">{{ errorMessage() }}</span>
+          </div>
+          <button
+            type="button"
+            class="vaj-error-alert-close"
+            (click)="dismissError()"
+            aria-label="بستن پیام خطا"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B9C7DE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      }
+
+      <!-- ═══════════════════════════════════════════════════
+           FIELD 1: Full Name
+           ═══════════════════════════════════════════════════ -->
+      <div class="vaj-field-wrapper">
+        <div class="vaj-field-input-wrapper">
+          <input
+            type="text"
+            formControlName="fullName"
+            id="fullName"
+            class="vaj-input peer"
+            placeholder=" "
+            autocomplete="name"
+            [attr.aria-label]="'نام و نام خانوادگی'"
+          />
+          <label for="fullName" class="vaj-floating-label">
+            نام و نام خانوادگی
+          </label>
+        </div>
+        @if (getErrorMessage(form.get('fullName'), 'fullName')) {
+          <div class="vaj-error-msg">
+            <span class="vaj-error-icon">!</span>
+            <span>{{ getErrorMessage(form.get('fullName'), 'fullName') }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           FIELD 2: Username
+           ═══════════════════════════════════════════════════ -->
+      <div class="vaj-field-wrapper">
+        <div class="vaj-field-input-wrapper">
+          <input
+            type="text"
+            formControlName="username"
+            id="username"
+            class="vaj-input peer"
+            placeholder=" "
+            autocomplete="username"
+            dir="ltr"
+            [attr.aria-label]="'نام کاربری'"
+          />
+          <label for="username" class="vaj-floating-label">
+            نام کاربری
+          </label>
+        </div>
+        @if (getErrorMessage(form.get('username'), 'username')) {
+          <div class="vaj-error-msg">
+            <span class="vaj-error-icon">!</span>
+            <span>{{ getErrorMessage(form.get('username'), 'username') }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           FIELD 3: Email
+           ═══════════════════════════════════════════════════ -->
+      <div class="vaj-field-wrapper">
+        <div class="vaj-field-input-wrapper">
+          <input
+            type="email"
+            formControlName="email"
+            id="email"
+            class="vaj-input peer"
+            placeholder=" "
+            autocomplete="email"
+            dir="ltr"
+            [attr.aria-label]="'ایمیل'"
+          />
+          <label for="email" class="vaj-floating-label">
+            ایمیل
+          </label>
+        </div>
+        @if (getErrorMessage(form.get('email'), 'email')) {
+          <div class="vaj-error-msg">
+            <span class="vaj-error-icon">!</span>
+            <span>{{ getErrorMessage(form.get('email'), 'email') }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           FIELD 4: Mobile
+           ═══════════════════════════════════════════════════ -->
+      <div class="vaj-field-wrapper">
+        <div class="vaj-field-input-wrapper">
+          <input
+            type="tel"
+            formControlName="mobile"
+            id="mobile"
+            class="vaj-input peer"
+            placeholder=" "
+            autocomplete="tel"
+            dir="ltr"
+            inputmode="numeric"
+            [attr.aria-label]="'شماره موبایل'"
+          />
+          <label for="mobile" class="vaj-floating-label">
+            شماره موبایل
+          </label>
+        </div>
+        @if (getErrorMessage(form.get('mobile'), 'mobile')) {
+          <div class="vaj-error-msg">
+            <span class="vaj-error-icon">!</span>
+            <span>{{ getErrorMessage(form.get('mobile'), 'mobile') }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           FIELD 5: Password
+           ═══════════════════════════════════════════════════ -->
+      <div class="vaj-field-wrapper">
+        <div class="vaj-field-input-wrapper vaj-field-input-wrapper--has-toggle">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            id="password"
+            class="vaj-input vaj-input--password peer"
+            placeholder=" "
+            autocomplete="new-password"
+            dir="ltr"
+            [attr.aria-label]="'رمز عبور'"
+          />
+          <label for="password" class="vaj-floating-label">
+            رمز عبور
+          </label>
+          <button
+            type="button"
+            class="vaj-password-toggle"
+            (click)="togglePasswordVisibility('password')"
+            [attr.aria-label]="showPassword() ? 'مخفی کردن رمز عبور' : 'نمایش رمز عبور'"
+            tabindex="-1"
+          >
+            @if (showPassword()) {
+              <!-- EyeOff icon -->
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B9C7DE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+                <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+              </svg>
+            } @else {
+              <!-- Eye icon -->
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B9C7DE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            }
+          </button>
+        </div>
+        @if (getErrorMessage(form.get('password'), 'password')) {
+          <div class="vaj-error-msg">
+            <span class="vaj-error-icon">!</span>
+            <span>{{ getErrorMessage(form.get('password'), 'password') }}</span>
+          </div>
+        }
+
+        <!-- Password Strength Component -->
+        <div class="vaj-password-strength-wrapper">
+          <vaj-password-strength [password]="passwordValue()" />
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           FIELD 6: Confirm Password
+           ═══════════════════════════════════════════════════ -->
+      <div class="vaj-field-wrapper">
+        <div class="vaj-field-input-wrapper vaj-field-input-wrapper--has-toggle">
+          <input
+            [type]="showConfirmPassword() ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            id="confirmPassword"
+            class="vaj-input vaj-input--password peer"
+            placeholder=" "
+            autocomplete="new-password"
+            dir="ltr"
+            [attr.aria-label]="'تکرار رمز عبور'"
+          />
+          <label for="confirmPassword" class="vaj-floating-label">
+            تکرار رمز عبور
+          </label>
+          <button
+            type="button"
+            class="vaj-password-toggle"
+            (click)="togglePasswordVisibility('confirmPassword')"
+            [attr.aria-label]="showConfirmPassword() ? 'مخفی کردن تکرار رمز عبور' : 'نمایش تکرار رمز عبور'"
+            tabindex="-1"
+          >
+            @if (showConfirmPassword()) {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B9C7DE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+                <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+              </svg>
+            } @else {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B9C7DE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            }
+          </button>
+        </div>
+        @if (getErrorMessage(form.get('confirmPassword'), 'confirmPassword')) {
+          <div class="vaj-error-msg">
+            <span class="vaj-error-icon">!</span>
+            <span>{{ getErrorMessage(form.get('confirmPassword'), 'confirmPassword') }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           FIELD 7: Country
+           ═══════════════════════════════════════════════════ -->
+      <div class="vaj-field-wrapper">
+        <div class="vaj-field-input-wrapper vaj-field-input-wrapper--select">
+          <select
+            formControlName="country"
+            id="country"
+            class="vaj-input vaj-select peer"
+            [attr.aria-label]="'کشور'"
+          >
+            <option value="" disabled selected hidden></option>
+            @for (country of countries; track country.code) {
+              <option [value]="country.code">
+                {{ country.flag }}&nbsp;{{ country.name }}
+              </option>
+            }
+          </select>
+          <label for="country" class="vaj-floating-label vaj-floating-label--select">
+            کشور
+          </label>
+          <!-- Custom dropdown arrow -->
+          <svg class="vaj-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B9C7DE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+        @if (getErrorMessage(form.get('country'), 'country')) {
+          <div class="vaj-error-msg">
+            <span class="vaj-error-icon">!</span>
+            <span>{{ getErrorMessage(form.get('country'), 'country') }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           FIELD 8: Language
+           ═══════════════════════════════════════════════════ -->
+      <div class="vaj-field-wrapper">
+        <div class="vaj-field-input-wrapper vaj-field-input-wrapper--select">
+          <select
+            formControlName="language"
+            id="language"
+            class="vaj-input vaj-select peer"
+            [attr.aria-label]="'زبان'"
+          >
+            <option value="" disabled selected hidden></option>
+            @for (lang of languages; track lang.code) {
+              <option [value]="lang.code">
+                {{ lang.nativeName }}
+              </option>
+            }
+          </select>
+          <label for="language" class="vaj-floating-label vaj-floating-label--select">
+            زبان
+          </label>
+          <svg class="vaj-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B9C7DE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+        @if (getErrorMessage(form.get('language'), 'language')) {
+          <div class="vaj-error-msg">
+            <span class="vaj-error-icon">!</span>
+            <span>{{ getErrorMessage(form.get('language'), 'language') }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           TERMS CHECKBOXES
+           ═══════════════════════════════════════════════════ -->
+      <div class="vaj-checkboxes-group">
+        <vaj-terms-checkbox
+          label="شرایط و قوانین استفاده از واج را می‌پذیرم."
+          [checked]="true"
+          [disabled]="isLoading()"
+        />
+        <vaj-terms-checkbox
+          label="تمایل دارم اعلان‌ها و نوتیفیکیشن‌ها را دریافت کنم."
+          [checked]="true"
+          [disabled]="isLoading()"
+        />
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           SUBMIT BUTTON
+           ═══════════════════════════════════════════════════ -->
+      <button
+        type="submit"
+        class="vaj-submit-btn"
+        [class.vaj-submit-btn--loading]="isLoading()"
+        [class.vaj-submit-btn--disabled]="form.invalid && !isLoading()"
+        [disabled]="form.invalid || isLoading()"
+      >
+        @if (isLoading()) {
+          <span class="vaj-spinner"></span>
+          <span>در حال ثبت‌نام...</span>
+        } @else {
+          <span>ثبت‌نام</span>
+        }
+      </button>
+
+    </form>
+  }
+</div>

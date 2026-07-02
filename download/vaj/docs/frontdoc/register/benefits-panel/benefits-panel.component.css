@@ -1,0 +1,456 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   BenefitsPanelComponent — VAJ Register Page
+   Colors : Primary #F3C969 · Secondary #6FA8FF · BG #07111F
+            Text #EEF4FF · Muted #B9C7DE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Design Tokens ───────────────────────────────────────────────────────── */
+:host {
+  --c-primary: #F3C969;
+  --c-primary-rgb: 243 201 105;
+  --c-secondary: #6FA8FF;
+  --c-secondary-rgb: 111 168 255;
+  --c-bg: #07111F;
+  --c-bg-lighter: #0C1A2E;
+  --c-text: #EEF4FF;
+  --c-muted: #B9C7DE;
+  --c-glass: rgba(238 244 255 / 0.04);
+  --c-glass-border: rgba(238 244 255 / 0.08);
+  --radius-lg: 1.25rem;
+  --radius-md: 0.875rem;
+  --radius-sm: 0.5rem;
+  display: block;
+  min-height: 100%;
+}
+
+/* ─── Panel Root ──────────────────────────────────────────────────────────── */
+.benefits-panel {
+  position: relative;
+  overflow: hidden;
+  background: var(--c-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 3rem 2.5rem;
+  font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+  color: var(--c-text);
+}
+
+/* ─── Ambient Golden Glow Orbs ────────────────────────────────────────────── */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0;
+  animation: glowFadeIn 2s ease-out 0.4s forwards;
+}
+
+.glow-orb--top {
+  width: 320px;
+  height: 320px;
+  top: -80px;
+  right: -60px;
+  background: radial-gradient(
+    circle,
+    rgba(var(--c-primary-rgb), 0.25) 0%,
+    transparent 70%
+  );
+  box-shadow: 0 0 120px 40px rgba(var(--c-primary-rgb), 0.12);
+}
+
+.glow-orb--bottom {
+  width: 260px;
+  height: 260px;
+  bottom: -60px;
+  left: -40px;
+  background: radial-gradient(
+    circle,
+    rgba(var(--c-secondary-rgb), 0.18) 0%,
+    transparent 70%
+  );
+  box-shadow: 0 0 100px 30px rgba(var(--c-secondary-rgb), 0.08);
+  animation-delay: 0.7s;
+}
+
+@keyframes glowFadeIn {
+  to { opacity: 1; }
+}
+
+/* ─── Content Wrapper ─────────────────────────────────────────────────────── */
+.benefits-panel__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 420px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HEADER — Logo & Slogan
+   ═══════════════════════════════════════════════════════════════════════════ */
+.benefits-panel__header {
+  text-align: center;
+}
+
+.logo-text {
+  display: inline-flex;
+  gap: 0.15em;
+  margin-bottom: 0.75rem;
+}
+
+.logo-text__letter {
+  display: inline-block;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--c-primary);
+  text-shadow:
+    0 0 20px rgba(var(--c-primary-rgb), 0.5),
+    0 0 60px rgba(var(--c-primary-rgb), 0.2);
+  letter-spacing: 0.08em;
+  animation: logoLetterIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.logo-text__letter:nth-child(1) { animation-delay: 0.1s; }
+.logo-text__letter:nth-child(2) { animation-delay: 0.2s; }
+.logo-text__letter:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes logoLetterIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.7);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.slogan {
+  font-size: 0.95rem;
+  color: var(--c-muted);
+  letter-spacing: 0.12em;
+  margin: 0;
+  opacity: 0;
+  animation: fadeSlideUp 0.6s ease-out 0.5s forwards;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CSS-ONLY BOOKSHELF ILLUSTRATION
+   ═══════════════════════════════════════════════════════════════════════════ */
+.bookshelf {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 340px;
+  opacity: 0;
+  animation: fadeSlideUp 0.8s ease-out 0.35s forwards;
+  transform-origin: center center;
+}
+
+/* ── Shelf Row ─────────────────────────────────────────────────────────────── */
+.bookshelf__row {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 72px;
+}
+
+/* ── Individual Book ───────────────────────────────────────────────────────── */
+.book {
+  border-radius: 2px 3px 3px 2px;
+  position: relative;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+/* Book spine highlight (simulated shine) */
+.book::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 2px;
+  width: 3px;
+  height: 100%;
+  border-radius: 1px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+}
+
+/* Subtle golden light hitting the tops of books */
+.book::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  border-radius: 2px 3px 0 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--c-primary-rgb), 0.35) 0%,
+    transparent 100%
+  );
+}
+
+/* ── Book Color Palette (warm, rich tones) ─────────────────────────────────── */
+.book--1  { width: 22px; height: 56px; background: linear-gradient(135deg, #8B2252 0%, #6B1840 100%); }
+.book--2  { width: 18px; height: 62px; background: linear-gradient(135deg, #C17817 0%, #9A5F10 100%); }
+.book--3  { width: 24px; height: 48px; background: linear-gradient(135deg, #1E6091 0%, #154A6E 100%); }
+.book--4  { width: 20px; height: 58px; background: linear-gradient(135deg, #2D6A4F 0%, #1B4332 100%); }
+.book--5  { width: 16px; height: 44px; background: linear-gradient(135deg, #7B2D8E 0%, #5A1F6A 100%); }
+
+.book--6  { width: 20px; height: 50px; background: linear-gradient(135deg, #B85C38 0%, #8E4628 100%); }
+.book--7  { width: 26px; height: 60px; background: linear-gradient(135deg, #1A5276 0%, #123B56 100%); }
+.book--8  { width: 18px; height: 46px; background: linear-gradient(135deg, #922B21 0%, #6E201A 100%); }
+.book--9  { width: 22px; height: 54px; background: linear-gradient(135deg, #1F618D 0%, #154360 100%); }
+
+.book--10 { width: 16px; height: 42px; background: linear-gradient(135deg, #7D6608 0%, #5B4A06 100%); }
+.book--11 { width: 24px; height: 58px; background: linear-gradient(135deg, #6C3483 0%, #512564 100%); }
+.book--12 { width: 20px; height: 52px; background: linear-gradient(135deg, #1E8449 0%, #15632F 100%); }
+.book--13 { width: 18px; height: 44px; background: linear-gradient(135deg, #A93226 0%, #7B251C 100%); }
+.book--14 { width: 22px; height: 56px; background: linear-gradient(135deg, #2C3E50 0%, #1A252F 100%); }
+
+/* ── Shelf Board (wooden plank) ───────────────────────────────────────────── */
+.shelf-board {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(
+    to bottom,
+    #3E2C1A 0%,
+    #2C1E10 40%,
+    #231708 100%
+  );
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(var(--c-primary-rgb), 0.08) inset;
+}
+
+/* Wood grain effect */
+.shelf-board::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 30px,
+    rgba(255, 255, 255, 0.02) 30px,
+    rgba(255, 255, 255, 0.02) 31px
+  );
+}
+
+/* ── Golden Light Ray Overlay ──────────────────────────────────────────────── */
+.bookshelf__light {
+  position: absolute;
+  top: -20%;
+  right: 10%;
+  width: 60%;
+  height: 120%;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--c-primary-rgb), 0.08) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  animation: lightPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes lightPulse {
+  0%   { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STATS ROW
+   ═══════════════════════════════════════════════════════════════════════════ */
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  flex: 1;
+  max-width: 130px;
+  padding: 0.85rem 0.5rem;
+  border-radius: var(--radius-md);
+  background: var(--c-glass);
+  border: 1px solid var(--c-glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0;
+  transform: translateY(16px) scale(0.95);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
+  transition-delay: var(--stagger, 0s);
+}
+
+.stat-card--visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.stat-card__number {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--c-primary);
+  text-shadow: 0 0 16px rgba(var(--c-primary-rgb), 0.35);
+  line-height: 1.2;
+  direction: ltr;
+}
+
+.stat-card__label {
+  font-size: 0.78rem;
+  color: var(--c-muted);
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BENEFITS LIST
+   ═══════════════════════════════════════════════════════════════════════════ */
+.benefits-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--c-glass);
+  border: 1px solid var(--c-glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: default;
+  opacity: 0;
+  transform: translateX(20px);
+  transition:
+    opacity 0.45s ease-out,
+    transform 0.45s ease-out,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+  /* Each item is staggered 100ms (0.3s, 0.4s, 0.5s, 0.6s, 0.7s) */
+  transition-delay: var(--stagger, 0s);
+}
+
+.benefit-item--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.benefit-item:hover {
+  background: rgba(var(--c-primary-rgb), 0.06);
+  box-shadow: 0 0 0 1px rgba(var(--c-primary-rgb), 0.1);
+}
+
+.benefit-item__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: var(--radius-sm);
+  background: rgba(var(--c-primary-rgb), 0.1);
+  color: var(--c-primary);
+}
+
+.benefit-item__label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SHARED KEYFRAMES
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE — Hidden on mobile (shown above form via register-page)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet and below: panel is hidden — register-page places a compact
+   version (or the full panel) above the form card */
+@media (max-width: 1023px) {
+  .benefits-panel {
+    display: none;
+  }
+}
+
+/* Large desktop refinements */
+@media (min-width: 1280px) {
+  .benefits-panel {
+    padding: 4rem 3.5rem;
+  }
+
+  .benefits-panel__content {
+    max-width: 460px;
+  }
+
+  .stat-card__number {
+    font-size: 1.5rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCROLLBAR STYLING (when panel content overflows)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.benefits-panel::-webkit-scrollbar {
+  width: 4px;
+}
+
+.benefits-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.benefits-panel::-webkit-scrollbar-thumb {
+  background: rgba(var(--c-primary-rgb), 0.2);
+  border-radius: 4px;
+}
+
+.benefits-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--c-primary-rgb), 0.35);
+}

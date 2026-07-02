@@ -1,0 +1,44 @@
+/* ================================================================
+   VAJ Register Page – Styles
+   Premium Persian reading platform
+   ================================================================ */
+
+/* ---------- Font ---------- */
+:host {
+  display: block;
+  font-family: 'IRANSansX', 'Vazirmatn', sans-serif;
+  color: #EEF4FF;
+}
+
+/* ---------- Page entrance animation ---------- */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.register-page {
+  animation: fadeInUp 600ms ease-out both;
+}
+
+/* ---------- Responsive adjustments ---------- */
+
+/* Tablets & small laptops */
+@media (max-width: 1023px) {
+  .register-page {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 639px) {
+  .register-page {
+    padding: 0;
+  }
+}

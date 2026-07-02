@@ -1,0 +1,81 @@
+/* ============================================
+   SocialLogin – Google Button & Divider Styles
+   VAJ Persian Premium Reading Platform
+   ============================================ */
+
+/* --- Divider line segments --- */
+.vaj-divider__line {
+  display: block;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Google button base (glass effect) --- */
+.vaj-google-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  height: 48px;
+  padding: 0 1.25rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #eef4ff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* --- Hover state --- */
+.vaj-google-btn:hover:not(:disabled):not(.vaj-google-btn--disabled) {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+  transform: scale(1.01);
+}
+
+/* --- Active / pressed state --- */
+.vaj-google-btn:active:not(:disabled):not(.vaj-google-btn--disabled) {
+  transform: scale(0.99);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Focus ring for accessibility --- */
+.vaj-google-btn:focus-visible {
+  box-shadow: 0 0 0 2px rgba(243, 201, 105, 0.3);
+}
+
+/* --- Disabled state --- */
+.vaj-google-btn--disabled,
+.vaj-google-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* --- Google "G" logo --- */
+.vaj-google-logo {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* --- Button label text --- */
+.vaj-google-btn__label {
+  color: #eef4ff;
+  font-size: 0.875rem;
+  line-height: 1;
+  user-select: none;
+}

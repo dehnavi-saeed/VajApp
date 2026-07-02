@@ -1,0 +1,99 @@
+/* ============================================
+   TermsCheckbox – Custom Checkbox Styles
+   VAJ Persian Premium Reading Platform
+   ============================================ */
+
+/* --- Custom checkbox box --- */
+.vaj-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Focus ring for accessibility */
+.vaj-checkbox:focus-visible {
+  box-shadow:
+    0 0 0 2px rgba(243, 201, 105, 0.3),
+    inset 0 0 0 1px transparent;
+}
+
+/* --- Checked state --- */
+.vaj-checkbox--checked {
+  background-color: #f3c969;
+  border-color: #f3c969;
+}
+
+/* --- Error state (unchecked + validation failure) --- */
+.vaj-checkbox--error:not(.vaj-checkbox--checked) {
+  border-color: rgba(255, 140, 140, 0.6);
+  animation: vaj-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* --- Disabled state --- */
+.vaj-checkbox--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* --- Checkmark SVG animation (scale 0 → 1 with overshoot) --- */
+.vaj-checkmark-svg {
+  transform: scale(0);
+  transform-origin: center center;
+  animation: vaj-check-pop 200ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* --- Checkmark pop keyframes --- */
+@keyframes vaj-check-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* --- Shake keyframes for error state --- */
+@keyframes vaj-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10% {
+    transform: translateX(-4px);
+  }
+  20% {
+    transform: translateX(4px);
+  }
+  30% {
+    transform: translateX(-3px);
+  }
+  40% {
+    transform: translateX(3px);
+  }
+  50% {
+    transform: translateX(-2px);
+  }
+  60% {
+    transform: translateX(2px);
+  }
+  70% {
+    transform: translateX(-1px);
+  }
+  80% {
+    transform: translateX(1px);
+  }
+}

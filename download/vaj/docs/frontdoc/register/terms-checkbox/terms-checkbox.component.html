@@ -1,0 +1,57 @@
+<!-- Hidden native checkbox for accessibility / screen readers -->
+<input
+  type="checkbox"
+  [id]="'vaj-tc-' + label()"
+  [checked]="checked()"
+  [disabled]="disabled()"
+  (change)="toggle()"
+  class="sr-only"
+  [attr.aria-checked]="checked()"
+  role="checkbox"
+/>
+
+<label
+  [attr.for]="'vaj-tc-' + label()"
+  class="inline-flex items-center gap-3 cursor-pointer select-none"
+  [class.opacity-50]="disabled()"
+>
+  <!-- Custom visual checkbox -->
+  <span
+    class="vaj-checkbox relative flex-shrink-0 flex items-center justify-center"
+    [class.vaj-checkbox--checked]="checked()"
+    [class.vaj-checkbox--error]="errorState()"
+    [class.vaj-checkbox--disabled]="disabled()"
+    tabindex="0"
+    role="presentation"
+    (keydown.enter)="toggle()"
+    (keydown.space)="toggle(); $event.preventDefault()"
+  >
+    <!-- Animated white checkmark SVG -->
+    <svg
+      *ngIf="checked()"
+      class="vaj-checkmark-svg"
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M2.5 6.5L4.75 8.75L9.5 3.5"
+        stroke="white"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </span>
+
+  <!-- Label text -->
+  <span
+    class="text-sm leading-relaxed"
+    [style.color]="'#EEF4FF'"
+  >
+    {{ label() }}
+  </span>
+</label>

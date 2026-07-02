@@ -1,0 +1,91 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     BenefitsPanelComponent — VAJ Register Page (Left / Hero Panel)
+     RTL · Persian · 45 % width on desktop · Full-width on mobile
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<aside class="benefits-panel" dir="rtl" aria-label="مزایای پلتفرم واج">
+
+  <!-- ── Ambient golden glow (decorative) ────────────────────────────────── -->
+  <div class="glow-orb glow-orb--top"></div>
+  <div class="glow-orb glow-orb--bottom"></div>
+
+  <!-- ── Content wrapper ─────────────────────────────────────────────────── -->
+  <div class="benefits-panel__content">
+
+    <!-- ── VAJ Logo & Slogan ─────────────────────────────────────────────── -->
+    <header class="benefits-panel__header">
+      <div class="logo-text">
+        <span class="logo-text__letter">V</span>
+        <span class="logo-text__letter">A</span>
+        <span class="logo-text__letter">J</span>
+      </div>
+      <p class="slogan">بخوان. بیاموز. رشد کن.</p>
+    </header>
+
+    <!-- ── CSS-Only Bookshelf Illustration ───────────────────────────────── -->
+    <section class="bookshelf" aria-hidden="true">
+      <!-- Shelf 1 -->
+      <div class="bookshelf__row">
+        <div class="book book--1"></div>
+        <div class="book book--2"></div>
+        <div class="book book--3"></div>
+        <div class="book book--4"></div>
+        <div class="book book--5"></div>
+        <div class="shelf-board"></div>
+      </div>
+      <!-- Shelf 2 -->
+      <div class="bookshelf__row">
+        <div class="book book--6"></div>
+        <div class="book book--7"></div>
+        <div class="book book--8"></div>
+        <div class="book book--9"></div>
+        <div class="shelf-board"></div>
+      </div>
+      <!-- Shelf 3 -->
+      <div class="bookshelf__row">
+        <div class="book book--10"></div>
+        <div class="book book--11"></div>
+        <div class="book book--12"></div>
+        <div class="book book--13"></div>
+        <div class="book book--14"></div>
+        <div class="shelf-board"></div>
+      </div>
+      <!-- Golden light ray overlay -->
+      <div class="bookshelf__light"></div>
+    </section>
+
+    <!-- ── Platform Stats ────────────────────────────────────────────────── -->
+    <div class="stats-row">
+      @for (stat of statTargets; track $index) {
+        <div
+          class="stat-card"
+          [class.stat-card--visible]="animateIn()"
+          [style.--stagger]="'0.' + $index + 's'"
+        >
+          <span class="stat-card__number">
+            {{ formattedCounters()[$index] }}
+          </span>
+          <span class="stat-card__label">{{ stat.label }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- ── Benefits List ─────────────────────────────────────────────────── -->
+    <ul class="benefits-list" role="list">
+      @for (benefit of benefits; track $index) {
+        <li
+          class="benefit-item"
+          [class.benefit-item--visible]="animateIn()"
+          [style.--stagger]="'0.' + ($index + 3) + 's'"
+        >
+          <span class="benefit-item__icon-wrap">
+            <ng-container
+              [ngComponentOutlet]="benefit.icon"
+              ngComponentOutletInputs="{ size: 20, color: '#F3C969' }"
+            ></ng-container>
+          </span>
+          <span class="benefit-item__label">{{ benefit.label }}</span>
+        </li>
+      }
+    </ul>
+  </div>
+</aside>

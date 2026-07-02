@@ -1,0 +1,31 @@
+/* ---- Ghost-link base ---- */
+.vaj-ghost-link {
+  position: relative;
+  display: inline-block;
+  color: #F3C969;
+  text-decoration: none;
+  font-weight: 600;
+  padding-right: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+/* ---- Animated underline that slides in from the right (RTL) ---- */
+.vaj-ghost-link::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  width: 0;
+  height: 1.5px;
+  background: #F3C969;
+  border-radius: 1px;
+  transition: width 0.3s ease;
+}
+
+.vaj-ghost-link:hover::after {
+  width: 100%;
+}
+
+.vaj-ghost-link:hover {
+  color: #e8b84d;
+}

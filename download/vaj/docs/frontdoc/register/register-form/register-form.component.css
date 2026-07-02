@@ -1,0 +1,732 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   VAJ Register Form Component — Production CSS
+   Premium Persian reading platform · Dark theme · RTL
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── HOST ──────────────────────────────────────────────────────────── */
+:host {
+  display: block;
+  width: 100%;
+  direction: rtl;
+}
+
+/* ─── KEYFRAMES ─────────────────────────────────────────────────────── */
+
+/* Error message slide-down + fade-in */
+@keyframes vaj-error-slide-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+    max-height: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 60px;
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
+}
+
+/* Error alert slide-in from top */
+@keyframes vaj-alert-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Spinner rotation */
+@keyframes vaj-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Shimmer for loading button */
+@keyframes vaj-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Success checkmark circle draw */
+@keyframes vaj-circle-draw {
+  0% {
+    stroke-dashoffset: 226.2;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Success checkmark polyline draw */
+@keyframes vaj-check-draw {
+  0% {
+    stroke-dashoffset: 50;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Success checkmark scale-in */
+@keyframes vaj-success-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Success title fade-up */
+@keyframes vaj-success-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── FORM ROOT ─────────────────────────────────────────────────────── */
+
+.vaj-form-root {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+/* ─── FIELD WRAPPER ─────────────────────────────────────────────────── */
+
+.vaj-field-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ─── FIELD INPUT WRAPPER ───────────────────────────────────────────── */
+
+.vaj-field-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* ─── INPUT BASE ────────────────────────────────────────────────────── */
+
+.vaj-input {
+  display: block;
+  width: 100%;
+  height: 48px;
+  padding: 16px 14px 8px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #EEF4FF;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  outline: none;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+}
+
+/* Focus state */
+.vaj-input:focus {
+  border-color: #F3C969;
+  box-shadow: 0 0 0 3px rgba(243, 201, 105, 0.12);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Disabled (loading) */
+.vaj-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── FLOATING LABEL ────────────────────────────────────────────────── */
+
+.vaj-floating-label {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  line-height: 1;
+  color: #B9C7DE;
+  pointer-events: none;
+  transition:
+    top 200ms ease,
+    transform 200ms ease,
+    font-size 200ms ease,
+    color 200ms ease;
+  transform-origin: right center;
+  padding: 0 2px;
+  background: transparent;
+  z-index: 1;
+}
+
+/* Floated state: when peer is focused OR has a value */
+.peer:focus ~ .vaj-floating-label,
+.peer:not(:placeholder-shown) ~ .vaj-floating-label {
+  top: 6px;
+  transform: translateY(0) scale(0.75);
+  color: #F3C969;
+  background: transparent;
+}
+
+/* ─── SELECT SPECIFIC ───────────────────────────────────────────────── */
+
+.vaj-select {
+  cursor: pointer;
+  padding-left: 40px;
+  padding-right: 14px;
+}
+
+/* Select label — always float since there's a hidden placeholder */
+.vaj-floating-label--select {
+  top: 6px;
+  transform: translateY(0) scale(0.75);
+  color: #B9C7DE;
+}
+
+/* Float select label to gold on focus */
+.vaj-field-input-wrapper--select .vaj-select:focus ~ .vaj-floating-label--select {
+  color: #F3C969;
+}
+
+/* Select has value — keep label gold */
+.vaj-field-input-wrapper--select
+  .vaj-select:not([value=""]):not(:invalid) ~ .vaj-floating-label--select,
+.vaj-field-input-wrapper--select
+  .vaj-select:valid:not(:placeholder-shown) ~ .vaj-floating-label--select {
+  color: #F3C969;
+}
+
+/* Use :has to detect selected option (modern browsers) */
+.vaj-field-input-wrapper--select:has(.vaj-select option:checked:not([disabled])) .vaj-floating-label--select {
+  color: #F3C969;
+}
+
+/* Custom dropdown arrow */
+.vaj-select-arrow {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: transform 200ms ease, color 200ms ease;
+  z-index: 1;
+}
+
+.vaj-field-input-wrapper--select:focus-within .vaj-select-arrow {
+  color: #F3C969;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Option styling (limited browser support, but helps where available) */
+.vaj-select option {
+  background-color: #0a1628;
+  color: #EEF4FF;
+  padding: 8px;
+}
+
+/* ─── PASSWORD INPUT ────────────────────────────────────────────────── */
+
+.vaj-input--password {
+  padding-left: 44px;
+}
+
+/* ─── PASSWORD TOGGLE BUTTON ────────────────────────────────────────── */
+
+.vaj-password-toggle {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #B9C7DE;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+  z-index: 2;
+  padding: 0;
+}
+
+.vaj-password-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #F3C969;
+}
+
+.vaj-password-toggle:active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.vaj-password-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.vaj-password-toggle svg {
+  display: block;
+  transition: stroke 150ms ease;
+}
+
+/* ─── ERROR MESSAGE ─────────────────────────────────────────────────── */
+
+.vaj-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 0 4px;
+  animation: vaj-error-slide-down 200ms ease forwards;
+  overflow: hidden;
+}
+
+.vaj-error-msg span:last-child {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #FF8C8C;
+}
+
+.vaj-error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 50%;
+  border: 1.5px solid #FF8C8C;
+  font-size: 9px;
+  font-weight: 700;
+  color: #FF8C8C;
+  line-height: 1;
+  text-align: center;
+  padding-bottom: 1px;
+}
+
+/* ─── PASSWORD STRENGTH WRAPPER ─────────────────────────────────────── */
+
+.vaj-password-strength-wrapper {
+  margin-top: 8px;
+  padding: 0 2px;
+}
+
+/* ─── GLASS ERROR ALERT ─────────────────────────────────────────────── */
+
+.vaj-error-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 4px;
+  background: rgba(255, 140, 140, 0.08);
+  border: 1px solid rgba(255, 140, 140, 0.2);
+  border-radius: 16px;
+  animation: vaj-alert-slide-in 300ms ease forwards;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.vaj-error-alert-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.vaj-error-alert-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #FF8C8C;
+  word-break: break-word;
+}
+
+.vaj-error-alert-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  color: #B9C7DE;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+  padding: 0;
+}
+
+.vaj-error-alert-close:hover {
+  background-color: rgba(255, 140, 140, 0.12);
+  color: #FF8C8C;
+}
+
+.vaj-error-alert-close:active {
+  background-color: rgba(255, 140, 140, 0.2);
+}
+
+/* ─── CHECKBOXES GROUP ──────────────────────────────────────────────── */
+
+.vaj-checkboxes-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+/* ─── SUBMIT BUTTON ─────────────────────────────────────────────────── */
+
+.vaj-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 48px;
+  margin-top: 4px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: #07111F;
+  background: linear-gradient(135deg, #F3C969, #E8B84D);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  outline: none;
+  transition:
+    filter 200ms ease,
+    transform 150ms ease,
+    opacity 200ms ease,
+    box-shadow 200ms ease;
+  box-shadow: 0 2px 12px rgba(243, 201, 105, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover */
+.vaj-submit-btn:not(:disabled):hover {
+  filter: brightness(1.08);
+  transform: scale(1.01);
+  box-shadow: 0 4px 20px rgba(243, 201, 105, 0.25);
+}
+
+/* Active */
+.vaj-submit-btn:not(:disabled):active {
+  transform: scale(0.99);
+  box-shadow: 0 1px 8px rgba(243, 201, 105, 0.1);
+}
+
+/* Focus ring */
+.vaj-submit-btn:focus-visible {
+  box-shadow:
+    0 0 0 3px rgba(243, 201, 105, 0.4),
+    0 2px 12px rgba(243, 201, 105, 0.15);
+}
+
+/* Disabled (form invalid, not loading) */
+.vaj-submit-btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Loading state */
+.vaj-submit-btn--loading {
+  cursor: wait;
+  background-size: 200% 100%;
+  animation: vaj-shimmer 2s ease-in-out infinite;
+  opacity: 0.9;
+}
+
+/* ─── SPINNER ───────────────────────────────────────────────────────── */
+
+.vaj-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(7, 17, 31, 0.2);
+  border-top-color: #07111F;
+  border-radius: 50%;
+  animation: vaj-spin 700ms linear infinite;
+}
+
+/* ─── SUCCESS STATE ─────────────────────────────────────────────────── */
+
+.vaj-success-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  text-align: center;
+  min-height: 320px;
+}
+
+.vaj-success-checkmark-wrapper {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 24px;
+  animation: vaj-success-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.vaj-success-checkmark {
+  width: 100%;
+  height: 100%;
+}
+
+.vaj-success-circle {
+  stroke-dasharray: 226.2;
+  stroke-dashoffset: 226.2;
+  animation: vaj-circle-draw 600ms cubic-bezier(0.65, 0, 0.35, 1) 200ms forwards;
+}
+
+.vaj-success-polyline {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: vaj-check-draw 400ms cubic-bezier(0.65, 0, 0.35, 1) 600ms forwards;
+}
+
+.vaj-success-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F3C969;
+  margin: 0 0 8px;
+  animation: vaj-success-fade-up 400ms ease 800ms both;
+}
+
+.vaj-success-subtitle {
+  font-size: 14px;
+  color: #B9C7DE;
+  margin: 0;
+  animation: vaj-success-fade-up 400ms ease 1000ms both;
+}
+
+/* ─── RTL SPECIFICS ─────────────────────────────────────────────────── */
+
+[dir="rtl"] .vaj-input {
+  text-align: right;
+}
+
+[dir="rtl"] .vaj-input[dir="ltr"] {
+  text-align: left;
+}
+
+[dir="rtl"] .vaj-select {
+  text-align: right;
+}
+
+/* ─── RESPONSIVE — MOBILE ───────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .vaj-form-root {
+    gap: 14px;
+  }
+
+  .vaj-input {
+    height: 44px;
+    font-size: 13px;
+    padding: 14px 12px 6px;
+    border-radius: 10px;
+  }
+
+  .vaj-floating-label {
+    right: 12px;
+    font-size: 13px;
+  }
+
+  .peer:focus ~ .vaj-floating-label,
+  .peer:not(:placeholder-shown) ~ .vaj-floating-label {
+    top: 5px;
+    transform: translateY(0) scale(0.72);
+  }
+
+  .vaj-floating-label--select {
+    right: 12px;
+    top: 5px;
+    transform: translateY(0) scale(0.72);
+  }
+
+  .vaj-input--password {
+    padding-left: 38px;
+  }
+
+  .vaj-password-toggle {
+    left: 6px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .vaj-password-toggle svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .vaj-select-arrow {
+    left: 10px;
+  }
+
+  .vaj-submit-btn {
+    height: 46px;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+
+  .vaj-error-alert {
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  .vaj-error-alert-text {
+    font-size: 12px;
+  }
+
+  .vaj-error-msg span:last-child {
+    font-size: 11px;
+  }
+
+  .vaj-success-root {
+    padding: 32px 16px;
+    min-height: 260px;
+  }
+
+  .vaj-success-checkmark-wrapper {
+    width: 64px;
+    height: 64px;
+  }
+
+  .vaj-success-circle {
+    /* Recalculate: 2π * 28 = 175.93 */
+    stroke-dasharray: 175.93;
+    stroke-dashoffset: 175.93;
+    animation: vaj-circle-draw 600ms cubic-bezier(0.65, 0, 0.35, 1) 200ms forwards;
+  }
+
+  .vaj-success-title {
+    font-size: 17px;
+  }
+
+  .vaj-success-subtitle {
+    font-size: 13px;
+  }
+
+  .vaj-checkboxes-group {
+    gap: 8px;
+  }
+
+  .vaj-password-strength-wrapper {
+    margin-top: 6px;
+  }
+}
+
+/* ─── RESPONSIVE — VERY SMALL SCREENS (<360px) ─────────────────────── */
+
+@media (max-width: 360px) {
+  .vaj-form-root {
+    gap: 12px;
+  }
+
+  .vaj-input {
+    height: 42px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .vaj-submit-btn {
+    height: 44px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+
+  .vaj-error-alert-content {
+    gap: 8px;
+  }
+}
+
+/* ─── DARK SCROLLBAR (for select dropdown on some browsers) ─────────── */
+
+.vaj-select::-webkit-scrollbar {
+  width: 6px;
+}
+
+.vaj-select::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.vaj-select::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+/* ─── AUTOFILL OVERRIDE (for browser autofill styling) ──────────────── */
+
+.vaj-input:-webkit-autofill,
+.vaj-input:-webkit-autofill:hover,
+.vaj-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #EEF4FF;
+  -webkit-box-shadow:
+    0 0 0px 1000px rgba(255, 255, 255, 0.06) inset;
+  transition:
+    background-color 5000s ease-in-out 0s,
+    color 200ms ease;
+  caret-color: #EEF4FF;
+}
+
+/* ─── NUMBER INPUT SPINNERS REMOVAL (for mobile tel field) ──────────── */
+
+.vaj-input[type="tel"]::-webkit-inner-spin-button,
+.vaj-input[type="tel"]::-webkit-outer-spin-button,
+.vaj-input[type="number"]::-webkit-inner-spin-button,
+.vaj-input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.vaj-input[type="tel"],
+.vaj-input[type="number"] {
+  -moz-appearance: textfield;
+}
